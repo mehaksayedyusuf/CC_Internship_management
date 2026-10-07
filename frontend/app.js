@@ -44,6 +44,13 @@ function setupNavigation() {
   });
 }
 
+function switchToTab(tab) {
+  const link = document.querySelector(`.nav-link[data-tab="${tab}"]`);
+  if (link) {
+    link.click();
+  }
+}
+
 // 1. DASHBOARD
 async function loadDashboard() {
   try {
@@ -61,25 +68,43 @@ async function loadDashboard() {
     document.getElementById('dash-total-internships').textContent = internshipsList.length;
     document.getElementById('dash-total-applications').textContent = applicationsList.length;
 
+    // Recent Applications
     const tbody = document.getElementById('dash-recent-tbody');
     if (applicationsList.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No applications submitted yet.</td></tr>';
-      return;
+    } else {
+      const recent = applicationsList.slice(-5).reverse();
+      tbody.innerHTML = recent.map(a => {
+        const student = studentsList.find(s => s.id === a.student_id);
+        const internship = internshipsList.find(i => i.id === a.internship_id);
+        return `
+          <tr>
+            <td>#${a.id}</td>
+            <td>${student ? escapeHtml(student.name) : 'Student #' + a.student_id}</td>
+            <td>${internship ? escapeHtml(internship.title) : 'Internship #' + a.internship_id}</td>
+            <td><span class="badge badge-${a.status}">${a.status}</span></td>
+          </tr>
+        `;
+      }).join('');
     }
 
-    const recent = applicationsList.slice(-5).reverse();
-    tbody.innerHTML = recent.map(a => {
-      const student = studentsList.find(s => s.id === a.student_id);
-      const internship = internshipsList.find(i => i.id === a.internship_id);
-      return `
+    // Recent Internships (show only latest 3)
+    const iTbody = document.getElementById('dash-recent-internships-tbody');
+    if (internshipsList.length === 0) {
+      iTbody.innerHTML = '<tr><td colspan="4" class="empty-state">No internships listed yet.</td></tr>';
+    } else {
+      const recentInternships = internshipsList.slice(-3).reverse();
+      iTbody.innerHTML = recentInternships.map(i => `
         <tr>
-          <td>#${a.id}</td>
-          <td>${student ? escapeHtml(student.name) : 'Student #' + a.student_id}</td>
-          <td>${internship ? escapeHtml(internship.title) : 'Internship #' + a.internship_id}</td>
-          <td><span class="badge badge-${a.status}">${a.status}</span></td>
+          <td><strong>${escapeHtml(i.title)}</strong></td>
+          <td>${escapeHtml(i.company)}</td>
+          <td>${escapeHtml(i.location || 'Remote')}</td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick="switchToTab('internships')">View</button>
+          </td>
         </tr>
-      `;
-    }).join('');
+      `).join('');
+    }
   } catch (err) {
     console.error('Error loading dashboard', err);
   }

@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Internship Management System</title>
+  <title>Internship Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,15 +16,21 @@
     <!-- Left Navigation -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h1>Internship System</h1>
-        <p>Microservices Project</p>
+        <div class="brand-logo">IMS</div>
+        <div class="brand-info">
+          <h1 class="brand-title">Internship Management</h1>
+          <p class="brand-subtitle">Microservices Project</p>
+        </div>
       </div>
 
       <nav class="sidebar-nav">
+        <div class="nav-section-title">MAIN</div>
         <div class="nav-link active" data-tab="dashboard">Dashboard</div>
         <div class="nav-link" data-tab="students">Students</div>
         <div class="nav-link" data-tab="internships">Internships</div>
         <div class="nav-link" data-tab="applications">Applications</div>
+
+        <div class="nav-section-title">SYSTEM</div>
         <div class="nav-link" data-tab="benchmarks">Benchmarks</div>
         <div class="nav-link" data-tab="health">Service Health</div>
       </nav>
@@ -37,7 +46,7 @@
         <h2 class="page-title">Dashboard</h2>
         <p class="page-subtitle">Overview of students, internships, and submitted applications</p>
 
-        <!-- Stats Row -->
+        <!-- Stats Row: Exactly 3 metrics -->
         <div class="stats-row">
           <div class="stat-box">
             <div class="stat-box-title">Total Students</div>
@@ -61,13 +70,33 @@
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Student</th>
-                  <th>Internship</th>
-                  <th>Status</th>
+                  <th>STUDENT</th>
+                  <th>INTERNSHIP</th>
+                  <th>STATUS</th>
                 </tr>
               </thead>
               <tbody id="dash-recent-tbody">
                 <tr><td colspan="4" class="empty-state">Loading recent applications...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Internships (Latest 3) -->
+        <div class="card">
+          <h3 class="card-title">Recent Internships</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>INTERNSHIP</th>
+                  <th>COMPANY</th>
+                  <th>LOCATION</th>
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="dash-recent-internships-tbody">
+                <tr><td colspan="4" class="empty-state">Loading recent internships...</td></tr>
               </tbody>
             </table>
           </div>
@@ -118,7 +147,7 @@
 
           <!-- Student Table -->
           <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
               <h3 class="card-title" style="margin-bottom:0;">Student List</h3>
               <button class="btn btn-secondary btn-sm" onclick="loadStudents()">Refresh</button>
             </div>
@@ -177,7 +206,7 @@
 
           <!-- Internship List -->
           <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
               <h3 class="card-title" style="margin-bottom:0;">Internship Listings</h3>
               <input type="text" id="search-internships" placeholder="Search internships..." style="max-width:200px;">
             </div>
@@ -240,7 +269,7 @@
 
           <!-- Application List Table -->
           <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
               <h3 class="card-title" style="margin-bottom:0;">Application List</h3>
               <button class="btn btn-secondary btn-sm" onclick="loadApplications()">Refresh</button>
             </div>
