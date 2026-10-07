@@ -1,4 +1,17 @@
 services:
+  frontend:
+    image: nginx:alpine
+    container_name: frontend-dashboard
+    ports:
+      - "8000:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - auth
+      - student
+      - internship
+      - application
+
   auth:
     image: authentication-service:latest
     build: ./authentication-service

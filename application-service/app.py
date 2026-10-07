@@ -2,6 +2,7 @@ import os
 import requests
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String, UniqueConstraint, create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -14,6 +15,14 @@ engine = create_engine(os.getenv("DATABASE_URL", "sqlite:///./applications.db"),
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 app = FastAPI(title="Application Service")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class Application(Base):
     __tablename__ = "applications"

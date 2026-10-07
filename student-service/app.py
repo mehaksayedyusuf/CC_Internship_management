@@ -1,5 +1,6 @@
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -10,6 +11,14 @@ engine = create_engine(os.getenv("DATABASE_URL", "sqlite:///./students.db"),
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 app = FastAPI(title="Student Service")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class Student(Base):
     __tablename__ = "students"

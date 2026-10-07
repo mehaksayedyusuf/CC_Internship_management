@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InternFlow | Microservices Internship Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand-wrapper">
+        <div class="brand-logo">⚡</div>
+        <div class="brand-title">
+          <h1>InternFlow Microservices</h1>
+          <p>Cloud Computing Mini-Project • FastAPI • Docker • SQLite</p>
+        </div>
+      </div>
+      
+      <!-- Live Microservice Badges -->
+      <div class="services-badge-bar">
+        <div class="service-pill" id="pill-auth">
+          <span class="pulse-dot"></span>
+          <span>Auth :8001</span>
+          <span class="status-text">...</span>
+        </div>
+        <div class="service-pill" id="pill-student">
+          <span class="pulse-dot"></span>
+          <span>Student :8002</span>
+          <span class="status-text">...</span>
+        </div>
+        <div class="service-pill" id="pill-internship">
+          <span class="pulse-dot"></span>
+          <span>Internship :8003</span>
+          <span class="status-text">...</span>
+        </div>
+        <div class="service-pill" id="pill-application">
+          <span class="pulse-dot"></span>
+          <span>Application :8004</span>
+          <span class="status-text">...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" data-tab="students">🎓 Students</button>
+      <button class="tab-btn" data-tab="internships">💼 Internships</button>
+      <button class="tab-btn" data-tab="applications">📄 Applications & Network Demo</button>
+      <button class="tab-btn" data-tab="auth">🔐 Authentication</button>
+      <button class="tab-btn" data-tab="benchmarks">📊 Performance Benchmarks</button>
+    </nav>
+
+    <!-- ==================================================== -->
+    <!-- TAB 1: STUDENTS -->
+    <!-- ==================================================== -->
+    <section class="tab-content active" id="tab-students">
+      <div class="grid-2">
+        <!-- Form -->
+        <div class="card">
+          <h2 class="card-title">Register Student</h2>
+          <p class="card-desc">Persisted in Student Service SQLite Database (:8002)</p>
+          <form id="student-form">
+            <div class="form-group">
+              <label for="student-name">Full Name</label>
+              <input type="text" id="student-name" placeholder="e.g. Rahul Sharma" required>
+            </div>
+            <div class="form-group">
+              <label for="student-email">Email Address</label>
+              <input type="email" id="student-email" placeholder="rahul@example.com" required>
+            </div>
+            <div class="form-group">
+              <label for="student-dept">Department</label>
+              <select id="student-dept">
+                <option value="Computer Science (CSE)">Computer Science (CSE)</option>
+                <option value="Information Science (ISE)">Information Science (ISE)</option>
+                <option value="Electronics (ECE)">Electronics (ECE)</option>
+                <option value="Artificial Intelligence (AI&DS)">Artificial Intelligence (AI&DS)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="student-year">Year of Study</label>
+              <select id="student-year">
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3" selected>3rd Year</option>
+                <option value="4">4th Year</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">+ Register Student</button>
+          </form>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div>
+              <h2 class="card-title">Student Directory</h2>
+              <p class="card-desc" style="margin-bottom:0;">Live records from student container</p>
+            </div>
+            <button class="btn btn-secondary" style="width:auto;padding:6px 12px;font-size:0.75rem;" onclick="loadStudents()">↻ Refresh</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Department</th>
+                  <th>Year</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="students-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- TAB 2: INTERNSHIPS -->
+    <!-- ==================================================== -->
+    <section class="tab-content" id="tab-internships">
+      <div class="grid-2">
+        <!-- Form -->
+        <div class="card">
+          <h2 class="card-title">Post New Internship</h2>
+          <p class="card-desc">Persisted in Internship Service SQLite Database (:8003)</p>
+          <form id="internship-form">
+            <div class="form-group">
+              <label for="internship-title">Role Title</label>
+              <input type="text" id="internship-title" placeholder="e.g. Cloud Engineer Intern" required>
+            </div>
+            <div class="form-group">
+              <label for="internship-company">Company</label>
+              <input type="text" id="internship-company" placeholder="e.g. Microsoft / Startup" required>
+            </div>
+            <div class="form-group">
+              <label for="internship-location">Location</label>
+              <input type="text" id="internship-location" placeholder="e.g. Remote / Bangalore" required>
+            </div>
+            <div class="form-group">
+              <label for="internship-desc">Requirements & Description</label>
+              <textarea id="internship-desc" rows="3" placeholder="FastAPI, Docker, Microservice architecture..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">+ Post Internship Listing</button>
+          </form>
+        </div>
+
+        <!-- Cards List -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div>
+              <h2 class="card-title">Available Listings</h2>
+              <p class="card-desc" style="margin-bottom:0;">Browse open opportunities</p>
+            </div>
+            <div style="width:220px;">
+              <input type="text" id="search-internships" placeholder="🔍 Search roles...">
+            </div>
+          </div>
+          <div class="internships-grid" id="internships-container"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- TAB 3: APPLICATIONS & INTER-SERVICE COMMUNICATION -->
+    <!-- ==================================================== -->
+    <section class="tab-content" id="tab-applications">
+      
+      <!-- Checkpoint 3 Callout -->
+      <div class="checkpoint-callout">
+        <div class="callout-icon">🌐</div>
+        <div class="callout-text">
+          <h3>Checkpoint 3: Microservice Communication Verified</h3>
+          <p>When you click <strong>"Submit Application"</strong>, the Application Service (:8004) sends internal HTTP requests to <code>http://student:8000</code> and <code>http://internship:8000</code> across Docker's bridge network to ensure both entities exist before persisting the record.</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Form -->
+        <div class="card">
+          <h2 class="card-title">Apply for Internship</h2>
+          <p class="card-desc">Application Service (:8004)</p>
+          <form id="apply-form">
+            <div class="form-group">
+              <label for="apply-student-id">Select Student</label>
+              <select id="apply-student-id" required>
+                <option value="">Loading students...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="apply-internship-id">Select Internship</label>
+              <select id="apply-internship-id" required>
+                <option value="">Loading internships...</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Application</button>
+          </form>
+
+          <hr style="border:none;border-top:1px solid var(--border-color);margin:24px 0;">
+
+          <!-- Inter-Service Rejection Demo Button -->
+          <h3 style="font-size:0.85rem;font-weight:600;margin-bottom:8px;color:#c7d2fe;">Live Evaluator Demo:</h3>
+          <button class="btn btn-accent-outline" onclick="testInvalidStudentDemo()">
+            ⚡ Test Invalid Student ID (Simulate 404 Rejection)
+          </button>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;">
+            Triggers an application with non-existent student <code>#99999</code> to prove the application service validates foreign records across containers.
+          </p>
+        </div>
+
+        <!-- Applications Table -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div>
+              <h2 class="card-title">Active Applications</h2>
+              <p class="card-desc" style="margin-bottom:0;">Submissions and decisions</p>
+            </div>
+            <button class="btn btn-secondary" style="width:auto;padding:6px 12px;font-size:0.75rem;" onclick="loadApplications()">↻ Refresh</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>App ID</th>
+                  <th>Student</th>
+                  <th>Internship</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="applications-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- TAB 4: AUTHENTICATION -->
+    <!-- ==================================================== -->
+    <section class="tab-content" id="tab-auth">
+      <div class="grid-2">
+        <!-- Registration -->
+        <div class="card">
+          <h2 class="card-title">User Registration</h2>
+          <p class="card-desc">Authentication Service (:8001) with Bcrypt hashing</p>
+          <form id="auth-reg-form">
+            <div class="form-group">
+              <label for="auth-name">Name</label>
+              <input type="text" id="auth-name" placeholder="User Name" required>
+            </div>
+            <div class="form-group">
+              <label for="auth-email">Email</label>
+              <input type="email" id="auth-email" placeholder="user@example.com" required>
+            </div>
+            <div class="form-group">
+              <label for="auth-pass">Password</label>
+              <input type="password" id="auth-pass" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Register User</button>
+          </form>
+        </div>
+
+        <!-- Login -->
+        <div class="card">
+          <h2 class="card-title">User Login</h2>
+          <p class="card-desc">Validate credentials against auth.db</p>
+          <form id="auth-login-form">
+            <div class="form-group">
+              <label for="login-email">Email</label>
+              <input type="email" id="login-email" placeholder="user@example.com" required>
+            </div>
+            <div class="form-group">
+              <label for="login-pass">Password</label>
+              <input type="password" id="login-pass" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-secondary">Login</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- TAB 5: BENCHMARKS & PLOTS -->
+    <!-- ==================================================== -->
+    <section class="tab-content" id="tab-benchmarks">
+      <div class="card" style="margin-bottom:24px;">
+        <h2 class="card-title">Checkpoint 4 & 5: Load Testing & Performance Evaluation</h2>
+        <p class="card-desc">Generated via Locust workload tests (W1 to W5) and Docker Stats resource monitoring</p>
+        
+        <div class="table-wrapper" style="margin-top:16px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Workload Level</th>
+                <th>Concurrent Requests</th>
+                <th>Avg Latency (ms)</th>
+                <th>Throughput (RPS)</th>
+                <th>Failed Requests</th>
+                <th>CPU Utilization (%)</th>
+                <th>Memory (MB)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>W1</strong></td><td>1 User</td><td>~8 - 10 ms</td><td>3.1 RPS</td><td>0</td><td>1.0 - 2.1%</td><td>~54 MB</td></tr>
+              <tr><td><strong>W2</strong></td><td>2 Users</td><td>~9 - 10 ms</td><td>6.0 RPS</td><td>0</td><td>2.5 - 2.9%</td><td>~54 MB</td></tr>
+              <tr><td><strong>W3</strong></td><td>4 Users</td><td>~9 - 10 ms</td><td>12.5 RPS</td><td>0</td><td>4.9 - 5.5%</td><td>~55 MB</td></tr>
+              <tr><td><strong>W4</strong></td><td>8 Users</td><td>~10 - 11 ms</td><td>25.8 RPS</td><td>0</td><td>9.5 - 11.1%</td><td>~55 MB</td></tr>
+              <tr><td><strong>W5</strong></td><td>16 Users</td><td>~10 - 11 ms</td><td>50.6 RPS</td><td>0</td><td>16.3 - 19.2%</td><td>~56 MB</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Generated Plots Display -->
+      <div class="plots-grid">
+        <div class="plot-card">
+          <img src="plots/1_response_time.png" alt="Average Response Time">
+          <div class="plot-title">1. Concurrent Requests vs. Average Response Time</div>
+        </div>
+        <div class="plot-card">
+          <img src="plots/2_throughput.png" alt="Throughput">
+          <div class="plot-title">2. Concurrent Requests vs. Throughput (RPS)</div>
+        </div>
+        <div class="plot-card">
+          <img src="plots/3_cpu_utilization.png" alt="CPU Utilization">
+          <div class="plot-title">3. Concurrent Requests vs. CPU Utilization (%)</div>
+        </div>
+        <div class="plot-card">
+          <img src="plots/4_memory_utilization.png" alt="Memory Utilization">
+          <div class="plot-title">4. Concurrent Requests vs. Memory Utilization (MB)</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
