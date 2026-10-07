@@ -1,0 +1,51 @@
+services:
+  auth:
+    build: ./authentication-service
+    container_name: auth-service
+    ports:
+      - "8001:8000"
+    environment:
+      DATABASE_URL: sqlite:////data/auth.db
+    volumes:
+      - auth_data:/data
+
+  student:
+    build: ./student-service
+    container_name: student-service
+    ports:
+      - "8002:8000"
+    environment:
+      DATABASE_URL: sqlite:////data/students.db
+    volumes:
+      - student_data:/data
+
+  internship:
+    build: ./internship-service
+    container_name: internship-service
+    ports:
+      - "8003:8000"
+    environment:
+      DATABASE_URL: sqlite:////data/internships.db
+    volumes:
+      - internship_data:/data
+
+  application:
+    build: ./application-service
+    container_name: application-service
+    ports:
+      - "8004:8000"
+    environment:
+      DATABASE_URL: sqlite:////data/applications.db
+      STUDENT_SERVICE_URL: http://student:8000
+      INTERNSHIP_SERVICE_URL: http://internship:8000
+    depends_on:
+      - student
+      - internship
+    volumes:
+      - application_data:/data
+
+volumes:
+  auth_data:
+  student_data:
+  internship_data:
+  application_data:
