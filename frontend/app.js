@@ -5,41 +5,38 @@ const API_URLS = {
   application: 'http://localhost:8004'
 };
 
-// Toast notifications
 function showToast(message, type = 'success') {
   const container = document.getElementById('toast-container');
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
-  toast.innerHTML = `<span>${type === 'success' ? '✓' : '⚠'}</span> <span>${message}</span>`;
+  toast.textContent = `[${type.toUpperCase()}] ${message}`;
   container.appendChild(toast);
   setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 300);
+    toast.remove();
   }, 4000);
 }
 
-// Health check indicators
 async function checkServiceHealth() {
   const services = ['auth', 'student', 'internship', 'application'];
   for (const s of services) {
     const el = document.getElementById(`pill-${s}`);
+    if (!el) continue;
     try {
       const res = await fetch(`${API_URLS[s]}/`, { method: 'GET' });
       if (res.ok) {
         el.className = 'service-pill online';
-        el.querySelector('.status-text').textContent = 'Online';
+        el.querySelector('.status-text').textContent = 'ONLINE';
       } else {
         el.className = 'service-pill offline';
-        el.querySelector('.status-text').textContent = 'Error';
+        el.querySelector('.status-text').textContent = 'ERROR';
       }
     } catch {
       el.className = 'service-pill offline';
-      el.querySelector('.status-text').textContent = 'Offline';
+      el.querySelector('.status-text').textContent = 'OFFLINE';
     }
   }
 }
 
-// Tab Switching
 function setupTabs() {
   const tabs = document.querySelectorAll('.tab-btn');
   tabs.forEach(tab => {
@@ -60,9 +57,7 @@ function setupTabs() {
   });
 }
 
-// ==========================================
-// 1. STUDENTS MODULE
-// ==========================================
+// 1. Students
 async function loadStudents() {
   const tbody = document.getElementById('students-tbody');
   tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>';
@@ -70,15 +65,15 @@ async function loadStudents() {
     const res = await fetch(`${API_URLS.student}/students`);
     const students = await res.json();
     if (!students || students.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No students registered yet. Add one on the left!</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No student records.</td></tr>';
       return;
     }
     tbody.innerHTML = students.map(s => `
       <tr>
-        <td><strong>#${s.id}</strong></td>
+        <td>#${s.id}</td>
         <td>${escapeHtml(s.name)}</td>
         <td>${escapeHtml(s.email)}</td>
-        <td><span class="badge" style="background:rgba(99,102,241,0.15);color:#a5b4fc;">${s.department || 'N/A'}</span></td>
+        <td>${escapeHtml(s.department || '-')}</td>
         <td>Year ${s.year || 1}</td>
         <td>
           <button class="btn btn-danger" onclick="deleteStudent(${s.id})">Delete</button>
@@ -86,7 +81,7 @@ async function loadStudents() {
       </tr>
     `).join('');
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="6" class="empty-state" style="color:#ef4444;">Failed to connect to Student Service (:8002).</td></tr>`;
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Unable to connect to Student Service (:8002).</td></tr>';
   }
 }
 
@@ -105,7 +100,7 @@ async function handleStudentSubmit(e) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || 'Failed to create student');
-    showToast(`Student "${data.name}" registered successfully!`);
+    showToast(`Created student #${data.id} (${data.name})`);
     document.getElementById('student-form').reset();
     loadStudents();
   } catch (err) {
@@ -117,17 +112,15 @@ async function deleteStudent(id) {
   if (!confirm(`Delete student #${id}?`)) return;
   try {
     const res = await fetch(`${API_URLS.student}/students/${id}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error('Failed to delete student');
-    showToast(`Student #${id} deleted.`);
+    if (!res.ok) throw new Error('Delete failed');
+    showToast(`Deleted student #${id}`);
     loadStudents();
   } catch (err) {
     showToast(err.message, 'error');
   }
 }
 
-// ==========================================
-// 2. INTERNSHIPS MODULE
-// ==========================================
+// 2. Internships
 let allInternships = [];
 
 async function loadInternships() {
@@ -138,31 +131,26 @@ async function loadInternships() {
     allInternships = await res.json();
     renderInternships(allInternships);
   } catch (err) {
-    container.innerHTML = '<div class="empty-state" style="color:#ef4444;">Failed to connect to Internship Service (:8003).</div>';
+    container.innerHTML = '<div class="empty-state">Unable to connect to Internship Service (:8003).</div>';
   }
 }
 
 function renderInternships(list) {
   const container = document.getElementById('internships-container');
   if (!list || list.length === 0) {
-    container.innerHTML = '<div class="empty-state">No internships found. Create one using the form on the left!</div>';
+    container.innerHTML = '<div class="empty-state">No internships found.</div>';
     return;
   }
   container.innerHTML = list.map(item => `
-    <div class="job-card">
-      <div>
-        <div class="job-header">
-          <div>
-            <div class="job-title">${escapeHtml(item.title)}</div>
-            <div class="job-company">${escapeHtml(item.company)}</div>
-          </div>
-          <span class="badge" style="background:rgba(255,255,255,0.06);color:#9ca3af;">#${item.id}</span>
-        </div>
-        <div class="job-location">📍 ${escapeHtml(item.location || 'Remote')}</div>
-        <div class="job-desc">${escapeHtml(item.description || 'No description provided.')}</div>
+    <div class="job-item">
+      <div class="job-title-row">
+        <span class="job-title">${escapeHtml(item.title)}</span>
+        <span style="font-size:11px;color:var(--text-muted);">#${item.id}</span>
       </div>
-      <div style="display:flex;gap:8px;margin-top:12px;">
-        <button class="btn btn-accent-outline" style="font-size:0.75rem;padding:6px 12px;" onclick="quickApply(${item.id})">Quick Apply</button>
+      <div class="job-meta">${escapeHtml(item.company)} | ${escapeHtml(item.location || 'Remote')}</div>
+      <div class="job-desc">${escapeHtml(item.description || 'No description.')}</div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-secondary" style="width:auto;" onclick="quickApply(${item.id})">Select for Application</button>
         <button class="btn btn-danger" onclick="deleteInternship(${item.id})">Delete</button>
       </div>
     </div>
@@ -184,7 +172,7 @@ async function handleInternshipSubmit(e) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || 'Failed to create internship');
-    showToast(`Internship "${data.title}" posted!`);
+    showToast(`Created internship #${data.id} (${data.title})`);
     document.getElementById('internship-form').reset();
     loadInternships();
   } catch (err) {
@@ -196,8 +184,8 @@ async function deleteInternship(id) {
   if (!confirm(`Delete internship #${id}?`)) return;
   try {
     const res = await fetch(`${API_URLS.internship}/internships/${id}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error('Failed to delete internship');
-    showToast(`Internship #${id} deleted.`);
+    if (!res.ok) throw new Error('Delete failed');
+    showToast(`Deleted internship #${id}`);
     loadInternships();
   } catch (err) {
     showToast(err.message, 'error');
@@ -214,9 +202,7 @@ function handleSearchInternships(e) {
   renderInternships(filtered);
 }
 
-// ==========================================
-// 3. APPLICATIONS & INTER-SERVICE MODULE
-// ==========================================
+// 3. Applications
 async function populateAppDropdowns() {
   const studentSelect = document.getElementById('apply-student-id');
   const internshipSelect = document.getElementById('apply-internship-id');
@@ -229,43 +215,43 @@ async function populateAppDropdowns() {
     const students = await sRes.json();
     const internships = await iRes.json();
 
-    studentSelect.innerHTML = '<option value="">Select Registered Student...</option>' + 
-      students.map(s => `<option value="${s.id}">#${s.id} - ${escapeHtml(s.name)} (${s.department || 'N/A'})</option>`).join('');
+    studentSelect.innerHTML = '<option value="">Select Student...</option>' + 
+      students.map(s => `<option value="${s.id}">#${s.id} - ${escapeHtml(s.name)}</option>`).join('');
 
-    internshipSelect.innerHTML = '<option value="">Select Internship Position...</option>' + 
-      internships.map(i => `<option value="${i.id}">#${i.id} - ${escapeHtml(i.title)} at ${escapeHtml(i.company)}</option>`).join('');
+    internshipSelect.innerHTML = '<option value="">Select Internship...</option>' + 
+      internships.map(i => `<option value="${i.id}">#${i.id} - ${escapeHtml(i.title)} (${escapeHtml(i.company)})</option>`).join('');
   } catch {
-    // Graceful fallback
+    //
   }
 }
 
 async function loadApplications() {
   const tbody = document.getElementById('applications-tbody');
-  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading applications...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading...</td></tr>';
   try {
     const res = await fetch(`${API_URLS.application}/applications`);
     const apps = await res.json();
     if (!apps || apps.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No applications submitted yet.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No applications submitted.</td></tr>';
       return;
     }
     tbody.innerHTML = apps.map(a => `
       <tr>
-        <td><strong>#${a.id}</strong></td>
-        <td>Student <strong>#${a.student_id}</strong></td>
-        <td>Internship <strong>#${a.internship_id}</strong></td>
+        <td>#${a.id}</td>
+        <td>Student #${a.student_id}</td>
+        <td>Internship #${a.internship_id}</td>
         <td><span class="badge badge-${a.status}">${a.status}</span></td>
         <td>
-          <div style="display:flex;gap:6px;">
-            <button class="btn btn-secondary" style="padding:4px 10px;font-size:0.75rem;width:auto;" onclick="updateAppStatus(${a.id}, 'accepted')">Accept</button>
-            <button class="btn btn-secondary" style="padding:4px 10px;font-size:0.75rem;width:auto;" onclick="updateAppStatus(${a.id}, 'rejected')">Reject</button>
+          <div style="display:flex;gap:4px;">
+            <button class="btn btn-secondary" style="padding:2px 8px;font-size:11px;width:auto;" onclick="updateAppStatus(${a.id}, 'accepted')">Accept</button>
+            <button class="btn btn-secondary" style="padding:2px 8px;font-size:11px;width:auto;" onclick="updateAppStatus(${a.id}, 'rejected')">Reject</button>
             <button class="btn btn-danger" onclick="deleteApplication(${a.id})">Delete</button>
           </div>
         </td>
       </tr>
     `).join('');
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty-state" style="color:#ef4444;">Failed to connect to Application Service (:8004).</td></tr>`;
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Unable to connect to Application Service (:8004).</td></tr>';
   }
 }
 
@@ -275,7 +261,7 @@ async function handleApplySubmit(e) {
   const internship_id = parseInt(document.getElementById('apply-internship-id').value);
 
   if (!student_id || !internship_id) {
-    showToast('Please select both a student and an internship.', 'error');
+    showToast('Select both student and internship', 'error');
     return;
   }
 
@@ -287,16 +273,14 @@ async function handleApplySubmit(e) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || 'Application failed');
-    showToast(`Application #${data.id} submitted! Status: ${data.status}`);
+    showToast(`Application #${data.id} recorded (${data.status})`);
     loadApplications();
   } catch (err) {
     showToast(err.message, 'error');
   }
 }
 
-// Checkpoint 3 Demonstration trigger: Test invalid student rejection
 async function testInvalidStudentDemo() {
-  showToast('Sending application with invalid Student ID (99999)...', 'info');
   try {
     const res = await fetch(`${API_URLS.application}/applications`, {
       method: 'POST',
@@ -305,12 +289,12 @@ async function testInvalidStudentDemo() {
     });
     const data = await res.json();
     if (!res.ok) {
-      alert(`[Checkpoint 3 Success]\nInter-Service Communication Verified!\n\nStatus Code: ${res.status}\nError Response: "${data.detail}"\n\nExplanation: Application Service (:8004) contacted Student Service (:8002) over the internal Docker network. Because student 99999 was not found, the application was rejected.`);
+      alert(`[Checkpoint 3 Inter-Service Validation Result]\n\nHTTP Status: ${res.status}\nMessage: "${data.detail}"\n\nExplanation: Application Service (:8004) sent a request to Student Service (:8002) to verify student existence. Student #99999 was not found, so the submission was rejected.`);
     } else {
       showToast('Unexpected success for invalid student', 'error');
     }
   } catch (err) {
-    showToast(`Error: ${err.message}`, 'error');
+    showToast(err.message, 'error');
   }
 }
 
@@ -322,8 +306,8 @@ async function updateAppStatus(id, status) {
       body: JSON.stringify({ status })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Failed to update status');
-    showToast(`Application #${id} status changed to ${status}!`);
+    if (!res.ok) throw new Error(data.detail || 'Failed');
+    showToast(`Application #${id} status: ${status}`);
     loadApplications();
   } catch (err) {
     showToast(err.message, 'error');
@@ -334,8 +318,8 @@ async function deleteApplication(id) {
   if (!confirm(`Delete application #${id}?`)) return;
   try {
     const res = await fetch(`${API_URLS.application}/applications/${id}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error('Failed to delete application');
-    showToast(`Application #${id} deleted.`);
+    if (!res.ok) throw new Error('Delete failed');
+    showToast(`Deleted application #${id}`);
     loadApplications();
   } catch (err) {
     showToast(err.message, 'error');
@@ -348,12 +332,10 @@ function quickApply(internshipId) {
   setTimeout(() => {
     const select = document.getElementById('apply-internship-id');
     if (select) select.value = internshipId;
-  }, 300);
+  }, 200);
 }
 
-// ==========================================
-// 4. AUTH MODULE
-// ==========================================
+// 4. Auth
 async function handleAuthRegister(e) {
   e.preventDefault();
   const name = document.getElementById('auth-name').value.trim();
@@ -368,7 +350,7 @@ async function handleAuthRegister(e) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || 'Registration failed');
-    showToast(`User ${data.name} registered successfully with Bcrypt hash!`);
+    showToast(`Registered user: ${data.name} (${data.email})`);
     document.getElementById('auth-reg-form').reset();
   } catch (err) {
     showToast(err.message, 'error');
@@ -388,7 +370,7 @@ async function handleAuthLogin(e) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || 'Login failed');
-    showToast(`Login successful! User ID: #${data.user_id}`);
+    showToast(`Authenticated user #${data.user_id}`);
     document.getElementById('auth-login-form').reset();
   } catch (err) {
     showToast(err.message, 'error');
@@ -404,13 +386,11 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
   setupTabs();
   checkServiceHealth();
   setInterval(checkServiceHealth, 8000);
 
-  // Forms
   document.getElementById('student-form')?.addEventListener('submit', handleStudentSubmit);
   document.getElementById('internship-form')?.addEventListener('submit', handleInternshipSubmit);
   document.getElementById('apply-form')?.addEventListener('submit', handleApplySubmit);
@@ -418,6 +398,5 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('auth-login-form')?.addEventListener('submit', handleAuthLogin);
   document.getElementById('search-internships')?.addEventListener('input', handleSearchInternships);
 
-  // Initial load
   loadStudents();
 });
