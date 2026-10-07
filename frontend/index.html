@@ -3,300 +3,775 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Internship Management System</title>
+  <title>University Internship & Career Management Portal</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
-  <div class="container">
-    <header>
-      <div class="brand-wrapper">
-        <div class="brand-badge">IMS</div>
-        <div class="brand-title">
-          <h1>Internship Management Microservices</h1>
-          <p>Cloud Computing Mini-Project | FastAPI, SQLite, Docker</p>
+  <div class="app-layout">
+    
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-header">
+          <div class="brand-icon">IMS</div>
+          <div class="brand-text">
+            <h1>Internship Portal</h1>
+            <p>Career & Placement Cell</p>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-group-title">Main</div>
+          <ul class="nav-list">
+            <li class="nav-item active" data-tab="dashboard">
+              <i data-lucide="layout-dashboard"></i>
+              <span>Dashboard</span>
+            </li>
+            <li class="nav-item" data-tab="students">
+              <i data-lucide="users"></i>
+              <span>Students</span>
+            </li>
+            <li class="nav-item" data-tab="internships">
+              <i data-lucide="briefcase"></i>
+              <span>Internships</span>
+            </li>
+            <li class="nav-item" data-tab="applications">
+              <i data-lucide="file-check-2"></i>
+              <span>Applications</span>
+            </li>
+          </ul>
+
+          <div class="nav-group-title">System</div>
+          <ul class="nav-list">
+            <li class="nav-item" data-tab="auth">
+              <i data-lucide="shield-check"></i>
+              <span>Authentication</span>
+            </li>
+            <li class="nav-item" data-tab="service-health">
+              <i data-lucide="activity"></i>
+              <span>Service Health</span>
+            </li>
+            <li class="nav-item" data-tab="benchmarks">
+              <i data-lucide="bar-chart-2"></i>
+              <span>Benchmarks</span>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Compact Microservice Health Footer -->
+      <div class="sidebar-footer">
+        <div class="mini-health-title">
+          <span>Microservices</span>
+          <span style="font-size:10px;color:var(--text-light);">Docker Network</span>
+        </div>
+        <div class="mini-services-grid">
+          <div class="mini-service-badge" id="badge-auth">
+            <span>Auth :8001</span>
+            <span class="status-dot online"></span>
+          </div>
+          <div class="mini-service-badge" id="badge-student">
+            <span>Student :8002</span>
+            <span class="status-dot online"></span>
+          </div>
+          <div class="mini-service-badge" id="badge-internship">
+            <span>Intern :8003</span>
+            <span class="status-dot online"></span>
+          </div>
+          <div class="mini-service-badge" id="badge-application">
+            <span>App :8004</span>
+            <span class="status-dot online"></span>
+          </div>
         </div>
       </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <div class="main-wrapper">
       
-      <div class="services-badge-bar">
-        <div class="service-pill" id="pill-auth">
-          <span>Auth:8001</span>
-          <span class="status-indicator status-text">...</span>
+      <!-- Top Header -->
+      <header class="app-header">
+        <div class="page-breadcrumb">
+          <span>Portal</span>
+          <span>/</span>
+          <span class="current" id="header-breadcrumb">Dashboard</span>
         </div>
-        <div class="service-pill" id="pill-student">
-          <span>Student:8002</span>
-          <span class="status-indicator status-text">...</span>
+        <div class="header-actions">
+          <span class="session-badge">Academic Session 2026-27</span>
         </div>
-        <div class="service-pill" id="pill-internship">
-          <span>Internship:8003</span>
-          <span class="status-indicator status-text">...</span>
-        </div>
-        <div class="service-pill" id="pill-application">
-          <span>Application:8004</span>
-          <span class="status-indicator status-text">...</span>
-        </div>
-      </div>
-    </header>
+      </header>
 
-    <nav class="tabs-nav">
-      <button class="tab-btn active" data-tab="students">Students</button>
-      <button class="tab-btn" data-tab="internships">Internships</button>
-      <button class="tab-btn" data-tab="applications">Applications</button>
-      <button class="tab-btn" data-tab="auth">Authentication</button>
-      <button class="tab-btn" data-tab="benchmarks">Benchmarks</button>
-    </nav>
+      <!-- Content Container -->
+      <main class="content-area">
 
-    <!-- Students -->
-    <section class="tab-content active" id="tab-students">
-      <div class="grid-2">
-        <div class="card">
-          <h2 class="card-title">Register Student</h2>
-          <p class="card-desc">Target: Student Service (Port 8002)</p>
-          <form id="student-form">
-            <div class="form-group">
-              <label for="student-name">Full Name</label>
-              <input type="text" id="student-name" placeholder="Name" required>
+        <!-- ==================================================== -->
+        <!-- VIEW 1: DASHBOARD -->
+        <!-- ==================================================== -->
+        <section class="page-view active" id="view-dashboard">
+          <div class="page-heading">
+            <div class="page-heading-text">
+              <h2>Internship Overview</h2>
+              <p>Key metrics and real-time activity across campus placement streams</p>
             </div>
-            <div class="form-group">
-              <label for="student-email">Email</label>
-              <input type="email" id="student-email" placeholder="student@example.com" required>
+          </div>
+
+          <!-- Top Stat Summary Blocks -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">
+                <span>Total Registered Students</span>
+                <i data-lucide="users" style="width:16px;height:16px;color:var(--text-muted);"></i>
+              </div>
+              <div class="stat-value" id="stat-total-students">0</div>
+              <div class="stat-footnote">Active in Student Service (:8002)</div>
             </div>
-            <div class="form-group">
-              <label for="student-dept">Department</label>
-              <select id="student-dept">
-                <option value="CSE">CSE</option>
-                <option value="ISE">ISE</option>
-                <option value="ECE">ECE</option>
-                <option value="AI&DS">AI&DS</option>
+
+            <div class="stat-card">
+              <div class="stat-label">
+                <span>Available Internships</span>
+                <i data-lucide="briefcase" style="width:16px;height:16px;color:var(--text-muted);"></i>
+              </div>
+              <div class="stat-value" id="stat-total-internships">0</div>
+              <div class="stat-footnote">Active in Internship Service (:8003)</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">
+                <span>Submitted Applications</span>
+                <i data-lucide="file-text" style="width:16px;height:16px;color:var(--text-muted);"></i>
+              </div>
+              <div class="stat-value" id="stat-total-applications">0</div>
+              <div class="stat-footnote">Recorded in Application Service (:8004)</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">
+                <span>Acceptance Rate</span>
+                <i data-lucide="check-circle" style="width:16px;height:16px;color:var(--text-muted);"></i>
+              </div>
+              <div class="stat-value" id="stat-acceptance-rate">0%</div>
+              <div class="stat-footnote">Approved candidate applications</div>
+            </div>
+          </div>
+
+          <!-- Dashboard Content 2-Column Grid -->
+          <div class="dashboard-grid">
+            
+            <!-- Left: Activity and Recent Lists -->
+            <div>
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <h3 class="card-header-title">Recent Applications</h3>
+                    <p class="card-header-desc">Latest student submissions across microservices</p>
+                  </div>
+                  <button class="btn btn-secondary btn-sm" onclick="navigateToTab('applications')">View All</button>
+                </div>
+                <div class="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Ref</th>
+                        <th>Student</th>
+                        <th>Internship</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dash-recent-applications">
+                      <tr><td colspan="4" class="empty-state">Loading applications...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <h3 class="card-header-title">Recent Internship Openings</h3>
+                    <p class="card-header-desc">Recently posted roles for campus recruitment</p>
+                  </div>
+                  <button class="btn btn-secondary btn-sm" onclick="navigateToTab('internships')">Explore</button>
+                </div>
+                <div class="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Role</th>
+                        <th>Company</th>
+                        <th>Location</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dash-recent-internships">
+                      <tr><td colspan="4" class="empty-state">Loading internships...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Breakdown blocks -->
+            <div>
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <h3 class="card-header-title">Application Status Distribution</h3>
+                    <p class="card-header-desc">Current lifecycle status</p>
+                  </div>
+                </div>
+                
+                <div style="margin-top:8px;">
+                  <div class="status-bar-row">
+                    <div class="status-bar-header">
+                      <span style="color:#b45309;">Pending Review</span>
+                      <span id="dash-count-pending">0</span>
+                    </div>
+                    <div class="status-bar-track">
+                      <div class="status-bar-fill fill-pending" id="bar-pending" style="width:0%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="status-bar-row">
+                    <div class="status-bar-header">
+                      <span style="color:#166534;">Accepted</span>
+                      <span id="dash-count-accepted">0</span>
+                    </div>
+                    <div class="status-bar-track">
+                      <div class="status-bar-fill fill-accepted" id="bar-accepted" style="width:0%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="status-bar-row">
+                    <div class="status-bar-header">
+                      <span style="color:#991b1b;">Rejected</span>
+                      <span id="dash-count-rejected">0</span>
+                    </div>
+                    <div class="status-bar-track">
+                      <div class="status-bar-fill fill-rejected" id="bar-rejected" style="width:0%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <h3 class="card-header-title">Academic Departments</h3>
+                    <p class="card-header-desc">Active enrollment pools</p>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border-color);">
+                    <span>Computer Science (CSE)</span>
+                    <span class="dept-badge" id="dept-count-cse">Active</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border-color);">
+                    <span>Information Science (ISE)</span>
+                    <span class="dept-badge" id="dept-count-ise">Active</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border-color);">
+                    <span>Electronics & Communication (ECE)</span>
+                    <span class="dept-badge" id="dept-count-ece">Active</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;">
+                    <span>Artificial Intelligence (AI&DS)</span>
+                    <span class="dept-badge" id="dept-count-aids">Active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==================================================== -->
+        <!-- VIEW 2: STUDENTS -->
+        <!-- ==================================================== -->
+        <section class="page-view" id="view-students">
+          <div class="page-heading">
+            <div class="page-heading-text">
+              <h2>Student Records</h2>
+              <p>Manage enrolled students, academic departments, and candidate profiles</p>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('modal-student')">
+              <i data-lucide="plus" style="width:16px;height:16px;"></i>
+              <span>Add Student</span>
+            </button>
+          </div>
+
+          <div class="card">
+            <!-- Filter & Search Bar -->
+            <div class="filter-bar">
+              <div class="search-input-wrapper">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="search-students" placeholder="Search by name, email or ID...">
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <select id="filter-student-dept" style="width:180px;">
+                  <option value="">All Departments</option>
+                  <option value="CSE">Computer Science (CSE)</option>
+                  <option value="ISE">Information Science (ISE)</option>
+                  <option value="ECE">Electronics (ECE)</option>
+                  <option value="AI&DS">Artificial Intelligence (AI&DS)</option>
+                </select>
+                <button class="btn btn-secondary btn-sm" onclick="loadStudents()">Refresh</button>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:70px;">ID</th>
+                    <th>Student Name</th>
+                    <th>Email Address</th>
+                    <th>Department</th>
+                    <th>Year of Study</th>
+                    <th style="text-align:right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="students-tbody">
+                  <tr><td colspan="6" class="empty-state">Loading students...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================== -->
+        <!-- VIEW 3: INTERNSHIPS -->
+        <!-- ==================================================== -->
+        <section class="page-view" id="view-internships">
+          <div class="page-heading">
+            <div class="page-heading-text">
+              <h2>Internship Opportunities</h2>
+              <p>Explore corporate postings, view role requirements, and submit applications</p>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('modal-internship')">
+              <i data-lucide="plus" style="width:16px;height:16px;"></i>
+              <span>Post Internship</span>
+            </button>
+          </div>
+
+          <div class="filter-bar" style="margin-bottom:20px;">
+            <div class="search-input-wrapper">
+              <i data-lucide="search" class="search-icon"></i>
+              <input type="text" id="search-internships" placeholder="Search position, company, or skill...">
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <select id="filter-internship-loc" style="width:160px;">
+                <option value="">All Locations</option>
+                <option value="Remote">Remote</option>
+                <option value="Onsite">Onsite</option>
+                <option value="Hybrid">Hybrid</option>
               </select>
-            </div>
-            <div class="form-group">
-              <label for="student-year">Year</label>
-              <select id="student-year">
-                <option value="1">Year 1</option>
-                <option value="2">Year 2</option>
-                <option value="3" selected>Year 3</option>
-                <option value="4">Year 4</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Create Student</button>
-          </form>
-        </div>
-
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-            <h2 class="card-title" style="margin-bottom:0;">Student Records</h2>
-            <button class="btn btn-secondary" style="width:auto;" onclick="loadStudents()">Refresh</button>
-          </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Department</th>
-                  <th>Year</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="students-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Internships -->
-    <section class="tab-content" id="tab-internships">
-      <div class="grid-2">
-        <div class="card">
-          <h2 class="card-title">Create Internship</h2>
-          <p class="card-desc">Target: Internship Service (Port 8003)</p>
-          <form id="internship-form">
-            <div class="form-group">
-              <label for="internship-title">Position Title</label>
-              <input type="text" id="internship-title" placeholder="Backend Intern" required>
-            </div>
-            <div class="form-group">
-              <label for="internship-company">Company</label>
-              <input type="text" id="internship-company" placeholder="Company Name" required>
-            </div>
-            <div class="form-group">
-              <label for="internship-location">Location</label>
-              <input type="text" id="internship-location" placeholder="Remote / Onsite" required>
-            </div>
-            <div class="form-group">
-              <label for="internship-desc">Description</label>
-              <textarea id="internship-desc" rows="3" placeholder="Internship role responsibilities"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Create Internship</button>
-          </form>
-        </div>
-
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-            <h2 class="card-title" style="margin-bottom:0;">Internship Listings</h2>
-            <div style="width:180px;">
-              <input type="text" id="search-internships" placeholder="Filter listings...">
+              <button class="btn btn-secondary btn-sm" onclick="loadInternships()">Refresh</button>
             </div>
           </div>
-          <div class="internships-grid" id="internships-container"></div>
-        </div>
-      </div>
-    </section>
 
-    <!-- Applications -->
-    <section class="tab-content" id="tab-applications">
-      <div class="notice-box">
-        <h3>Checkpoint 3: Inter-Service Verification</h3>
-        <p>Application Service verifies student and internship existence across container network before creating an application record.</p>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <h2 class="card-title">Submit Application</h2>
-          <p class="card-desc">Target: Application Service (Port 8004)</p>
-          <form id="apply-form">
-            <div class="form-group">
-              <label for="apply-student-id">Student</label>
-              <select id="apply-student-id" required>
-                <option value="">Loading students...</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="apply-internship-id">Internship</label>
-              <select id="apply-internship-id" required>
-                <option value="">Loading internships...</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit Application</button>
-          </form>
-
-          <hr style="border:none;border-top:1px solid var(--border-color);margin:16px 0;">
-
-          <button class="btn btn-outline" onclick="testInvalidStudentDemo()">
-            Test Non-Existent Student ID (99999)
-          </button>
-        </div>
-
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-            <h2 class="card-title" style="margin-bottom:0;">Applications</h2>
-            <button class="btn btn-secondary" style="width:auto;" onclick="loadApplications()">Refresh</button>
+          <!-- Cards Grid for Internships -->
+          <div class="internships-grid" id="internships-container">
+            <div class="empty-state">Loading internships...</div>
           </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Student ID</th>
-                  <th>Internship ID</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="applications-tbody"></tbody>
-            </table>
+        </section>
+
+        <!-- ==================================================== -->
+        <!-- VIEW 4: APPLICATIONS -->
+        <!-- ==================================================== -->
+        <section class="page-view" id="view-applications">
+          <div class="page-heading">
+            <div class="page-heading-text">
+              <h2>Application Tracker</h2>
+              <p>Review candidate applications, manage verification, and update decisions</p>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('modal-apply')">
+              <i data-lucide="plus" style="width:16px;height:16px;"></i>
+              <span>New Application</span>
+            </button>
           </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- Auth -->
-    <section class="tab-content" id="tab-auth">
-      <div class="grid-2">
-        <div class="card">
-          <h2 class="card-title">Register User</h2>
-          <p class="card-desc">Auth Service (Port 8001)</p>
-          <form id="auth-reg-form">
-            <div class="form-group">
-              <label for="auth-name">Name</label>
-              <input type="text" id="auth-name" placeholder="Name" required>
+          <!-- Checkpoint 3 Verification Callout -->
+          <div class="info-banner">
+            <div class="info-banner-content">
+              <h4>Checkpoint 3: Microservice Communication Active</h4>
+              <p>Submitting an application triggers inter-service HTTP requests from Application Service (:8004) to Student Service (:8002) and Internship Service (:8003).</p>
             </div>
-            <div class="form-group">
-              <label for="auth-email">Email</label>
-              <input type="email" id="auth-email" placeholder="user@example.com" required>
-            </div>
-            <div class="form-group">
-              <label for="auth-pass">Password</label>
-              <input type="password" id="auth-pass" placeholder="Password" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-          </form>
-        </div>
+            <button class="btn btn-secondary btn-sm" onclick="testInvalidStudentDemo()">
+              Test Invalid Student ID (99999)
+            </button>
+          </div>
 
-        <div class="card">
-          <h2 class="card-title">User Login</h2>
-          <p class="card-desc">Auth Service (Port 8001)</p>
-          <form id="auth-login-form">
-            <div class="form-group">
-              <label for="login-email">Email</label>
-              <input type="email" id="login-email" placeholder="user@example.com" required>
+          <div class="card">
+            <div class="filter-bar">
+              <div class="search-input-wrapper">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="search-applications" placeholder="Filter by student ID or internship ID...">
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <select id="filter-app-status" style="width:150px;">
+                  <option value="">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="accepted">Accepted</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+                <button class="btn btn-secondary btn-sm" onclick="loadApplications()">Refresh</button>
+              </div>
             </div>
-            <div class="form-group">
-              <label for="login-pass">Password</label>
-              <input type="password" id="login-pass" placeholder="Password" required>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:70px;">Ref ID</th>
+                    <th>Candidate</th>
+                    <th>Internship Position</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Decision Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="applications-tbody">
+                  <tr><td colspan="5" class="empty-state">Loading applications...</td></tr>
+                </tbody>
+              </table>
             </div>
-            <button type="submit" class="btn btn-secondary">Login</button>
-          </form>
-        </div>
-      </div>
-    </section>
+          </div>
+        </section>
 
-    <!-- Benchmarks -->
-    <section class="tab-content" id="tab-benchmarks">
-      <div class="card" style="margin-bottom:16px;">
-        <h2 class="card-title">Locust Workload Observations</h2>
-        <p class="card-desc">Metrics collected across concurrency levels W1 through W5</p>
-        
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Workload</th>
-                <th>Users</th>
-                <th>Avg Latency (ms)</th>
-                <th>Throughput (RPS)</th>
-                <th>Failures</th>
-                <th>CPU (%)</th>
-                <th>Memory (MB)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>W1</td><td>1</td><td>8.0 - 10.5 ms</td><td>3.1 RPS</td><td>0</td><td>1.0 - 2.1%</td><td>53 - 55 MB</td></tr>
-              <tr><td>W2</td><td>2</td><td>9.0 - 10.5 ms</td><td>5.8 - 6.9 RPS</td><td>0</td><td>2.5 - 3.0%</td><td>54 - 55 MB</td></tr>
-              <tr><td>W3</td><td>4</td><td>9.1 - 10.3 ms</td><td>11.6 - 13.6 RPS</td><td>0</td><td>4.9 - 5.5%</td><td>54 - 55 MB</td></tr>
-              <tr><td>W4</td><td>8</td><td>9.4 - 11.2 ms</td><td>25.6 - 26.4 RPS</td><td>0</td><td>3.9 - 11.1%</td><td>55 MB</td></tr>
-              <tr><td>W5</td><td>16</td><td>10.4 - 11.7 ms</td><td>50.4 - 50.8 RPS</td><td>0</td><td>3.9 - 19.2%</td><td>54 - 56 MB</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+        <!-- ==================================================== -->
+        <!-- VIEW 5: AUTHENTICATION -->
+        <!-- ==================================================== -->
+        <section class="page-view" id="view-auth">
+          <div class="page-heading">
+            <div class="page-heading-text">
+              <h2>Portal Authentication</h2>
+              <p>Authentication Service (:8001) with Bcrypt password security</p>
+            </div>
+          </div>
 
-      <div class="plots-grid">
-        <div class="plot-item">
-          <img src="plots/1_response_time.png" alt="Response Time Graph">
-          <div class="plot-label">1. Concurrent Requests vs Average Response Time</div>
-        </div>
-        <div class="plot-item">
-          <img src="plots/2_throughput.png" alt="Throughput Graph">
-          <div class="plot-label">2. Concurrent Requests vs Throughput (RPS)</div>
-        </div>
-        <div class="plot-item">
-          <img src="plots/3_cpu_utilization.png" alt="CPU Utilization Graph">
-          <div class="plot-label">3. Concurrent Requests vs CPU Utilization</div>
-        </div>
-        <div class="plot-item">
-          <img src="plots/4_memory_utilization.png" alt="Memory Utilization Graph">
-          <div class="plot-label">4. Concurrent Requests vs Memory Utilization</div>
-        </div>
-      </div>
-    </section>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-header-title">Register Portal User</h3>
+                  <p class="card-header-desc">Adds record to auth.db with hashed credentials</p>
+                </div>
+              </div>
+              <form id="auth-reg-form">
+                <div class="form-group">
+                  <label for="auth-name">Full Name</label>
+                  <input type="text" id="auth-name" placeholder="Name" required>
+                </div>
+                <div class="form-group">
+                  <label for="auth-email">University Email</label>
+                  <input type="email" id="auth-email" placeholder="user@university.edu" required>
+                </div>
+                <div class="form-group">
+                  <label for="auth-pass">Password</label>
+                  <input type="password" id="auth-pass" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Create User Account</button>
+              </form>
+            </div>
 
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-header-title">User Authentication</h3>
+                  <p class="card-header-desc">Verify password hash on Authentication Service</p>
+                </div>
+              </div>
+              <form id="auth-login-form">
+                <div class="form-group">
+                  <label for="login-email">Registered Email</label>
+                  <input type="email" id="login-email" placeholder="user@university.edu" required>
+                </div>
+                <div class="form-group">
+                  <label for="login-pass">Account Password</label>
+                  <input type="password" id="login-pass" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-secondary">Sign In</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================== -->
+        <!-- VIEW 6: SERVICE HEALTH -->
+        <!-- ==================================================== -->
+        <section class="page-view" id="view-service-health">
+          <div class="page-heading">
+            <div class="page-heading-text">
+              <h2>Microservices Infrastructure</h2>
+              <p>Network status, container ports, and SQLite database volume persistence</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="checkServiceHealth()">Test All Services</button>
+          </div>
+
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Service Name</th>
+                    <th>Container Endpoint</th>
+                    <th>Database Engine</th>
+                    <th>Docker Named Volume</th>
+                    <th>Network Status</th>
+                    <th style="text-align:right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Authentication Service</strong></td>
+                    <td><code>http://localhost:8001</code></td>
+                    <td>SQLite (auth.db)</td>
+                    <td><code>auth_data</code></td>
+                    <td><span class="status-badge badge-accepted" id="health-auth-badge">Online</span></td>
+                    <td style="text-align:right;"><button class="btn btn-secondary btn-sm" onclick="pingService('auth')">Ping</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Student Service</strong></td>
+                    <td><code>http://localhost:8002</code></td>
+                    <td>SQLite (students.db)</td>
+                    <td><code>student_data</code></td>
+                    <td><span class="status-badge badge-accepted" id="health-student-badge">Online</span></td>
+                    <td style="text-align:right;"><button class="btn btn-secondary btn-sm" onclick="pingService('student')">Ping</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Internship Service</strong></td>
+                    <td><code>http://localhost:8003</code></td>
+                    <td>SQLite (internships.db)</td>
+                    <td><code>internship_data</code></td>
+                    <td><span class="status-badge badge-accepted" id="health-internship-badge">Online</span></td>
+                    <td style="text-align:right;"><button class="btn btn-secondary btn-sm" onclick="pingService('internship')">Ping</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Application Service</strong></td>
+                    <td><code>http://localhost:8004</code></td>
+                    <td>SQLite (applications.db)</td>
+                    <td><code>application_data</code></td>
+                    <td><span class="status-badge badge-accepted" id="health-application-badge">Online</span></td>
+                    <td style="text-align:right;"><button class="btn btn-secondary btn-sm" onclick="pingService('application')">Ping</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================== -->
+        <!-- VIEW 7: BENCHMARKS -->
+        <!-- ==================================================== -->
+        <section class="page-view" id="view-benchmarks">
+          <div class="page-heading">
+            <div class="page-heading-text">
+              <h2>Engineering Analytics & Benchmarks</h2>
+              <p>Locust load testing observations (W1 to W5) and Docker container resource utilization</p>
+            </div>
+          </div>
+
+          <!-- Benchmark Summary Bar -->
+          <div class="benchmark-summary-bar">
+            <div class="benchmark-stat">
+              <div class="benchmark-stat-label">Concurrency Range</div>
+              <div class="benchmark-stat-val">1 - 16 Users</div>
+            </div>
+            <div class="benchmark-stat">
+              <div class="benchmark-stat-label">Max Throughput</div>
+              <div class="benchmark-stat-val">50.8 RPS</div>
+            </div>
+            <div class="benchmark-stat">
+              <div class="benchmark-stat-label">Average Latency</div>
+              <div class="benchmark-stat-val">10.4 ms</div>
+            </div>
+            <div class="benchmark-stat">
+              <div class="benchmark-stat-label">Failure Rate</div>
+              <div class="benchmark-stat-val">0.0%</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-header-title">Workload Observation Dataset</h3>
+                <p class="card-header-desc">Empirical metrics logged during Locust concurrent benchmarking</p>
+              </div>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Workload</th>
+                    <th>Concurrent Users</th>
+                    <th>Avg Latency (ms)</th>
+                    <th>Throughput (RPS)</th>
+                    <th>Failed Requests</th>
+                    <th>CPU Utilization (%)</th>
+                    <th>Memory Footprint (MB)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>W1</strong></td><td>1 User</td><td>8.0 - 10.5 ms</td><td>3.1 RPS</td><td>0</td><td>1.0 - 2.1%</td><td>53.2 - 55.2 MB</td></tr>
+                  <tr><td><strong>W2</strong></td><td>2 Users</td><td>9.0 - 10.5 ms</td><td>5.8 - 6.9 RPS</td><td>0</td><td>2.5 - 3.0%</td><td>53.9 - 55.5 MB</td></tr>
+                  <tr><td><strong>W3</strong></td><td>4 Users</td><td>9.1 - 10.3 ms</td><td>11.6 - 13.6 RPS</td><td>0</td><td>4.9 - 5.5%</td><td>54.5 - 55.1 MB</td></tr>
+                  <tr><td><strong>W4</strong></td><td>8 Users</td><td>9.4 - 11.2 ms</td><td>25.6 - 26.4 RPS</td><td>0</td><td>3.9 - 11.1%</td><td>55.0 - 55.5 MB</td></tr>
+                  <tr><td><strong>W5</strong></td><td>16 Users</td><td>10.4 - 11.7 ms</td><td>50.4 - 50.8 RPS</td><td>0</td><td>3.9 - 19.2%</td><td>54.2 - 56.1 MB</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Plots Grid -->
+          <div class="plots-grid">
+            <div class="plot-panel">
+              <img src="plots/1_response_time.png" alt="Average Response Time">
+              <div class="plot-caption">Figure 1: Concurrency vs Average Latency (ms)</div>
+            </div>
+            <div class="plot-panel">
+              <img src="plots/2_throughput.png" alt="Throughput RPS">
+              <div class="plot-caption">Figure 2: Concurrency vs Throughput (RPS)</div>
+            </div>
+            <div class="plot-panel">
+              <img src="plots/3_cpu_utilization.png" alt="CPU Utilization">
+              <div class="plot-caption">Figure 3: Concurrency vs CPU Utilization (%)</div>
+            </div>
+            <div class="plot-panel">
+              <img src="plots/4_memory_utilization.png" alt="Memory Utilization">
+              <div class="plot-caption">Figure 4: Concurrency vs Memory Footprint (MB)</div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
   </div>
 
+  <!-- ==================================================== -->
+  <!-- MODALS -->
+  <!-- ==================================================== -->
+  
+  <!-- Add Student Modal -->
+  <div class="modal-overlay" id="modal-student">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Register New Student</h3>
+        <button class="modal-close" onclick="closeModal('modal-student')">✕</button>
+      </div>
+      <form id="student-form">
+        <div class="form-group">
+          <label for="student-name">Full Name</label>
+          <input type="text" id="student-name" placeholder="Student name" required>
+        </div>
+        <div class="form-group">
+          <label for="student-email">Email Address</label>
+          <input type="email" id="student-email" placeholder="student@university.edu" required>
+        </div>
+        <div class="form-group">
+          <label for="student-dept">Department</label>
+          <select id="student-dept">
+            <option value="CSE">Computer Science (CSE)</option>
+            <option value="ISE">Information Science (ISE)</option>
+            <option value="ECE">Electronics (ECE)</option>
+            <option value="AI&DS">Artificial Intelligence (AI&DS)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="student-year">Year of Study</label>
+          <select id="student-year">
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3" selected>3rd Year</option>
+            <option value="4">4th Year</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-student')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Student</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Post Internship Modal -->
+  <div class="modal-overlay" id="modal-internship">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Create Internship Position</h3>
+        <button class="modal-close" onclick="closeModal('modal-internship')">✕</button>
+      </div>
+      <form id="internship-form">
+        <div class="form-group">
+          <label for="internship-title">Position Title</label>
+          <input type="text" id="internship-title" placeholder="e.g. Backend Software Intern" required>
+        </div>
+        <div class="form-group">
+          <label for="internship-company">Hiring Organization / Company</label>
+          <input type="text" id="internship-company" placeholder="e.g. Cisco Systems" required>
+        </div>
+        <div class="form-group">
+          <label for="internship-location">Location</label>
+          <input type="text" id="internship-location" placeholder="Remote / Bangalore / Hybrid" required>
+        </div>
+        <div class="form-group">
+          <label for="internship-desc">Role Description</label>
+          <textarea id="internship-desc" rows="3" placeholder="Key responsibilities and qualifications..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-internship')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Publish Role</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Submit Application Modal -->
+  <div class="modal-overlay" id="modal-apply">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Submit Internship Application</h3>
+        <button class="modal-close" onclick="closeModal('modal-apply')">✕</button>
+      </div>
+      <form id="apply-form">
+        <div class="form-group">
+          <label for="apply-student-id">Select Student</label>
+          <select id="apply-student-id" required>
+            <option value="">Loading student records...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="apply-internship-id">Select Position</label>
+          <select id="apply-internship-id" required>
+            <option value="">Loading internship listings...</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-apply')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Details Modal -->
+  <div class="modal-overlay" id="modal-details">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="details-modal-title">Internship Details</h3>
+        <button class="modal-close" onclick="closeModal('modal-details')">✕</button>
+      </div>
+      <div id="details-modal-body" style="font-size:13px;line-height:1.6;"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-details')">Close</button>
+        <button type="button" class="btn btn-primary" id="details-apply-btn">Apply For Role</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
   <div id="toast-container"></div>
+
   <script src="app.js"></script>
 </body>
 </html>
