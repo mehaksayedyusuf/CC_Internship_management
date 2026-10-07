@@ -1,5 +1,6 @@
 services:
   auth:
+    image: authentication-service:latest
     build: ./authentication-service
     container_name: auth-service
     ports:
@@ -10,6 +11,7 @@ services:
       - auth_data:/data
 
   student:
+    image: student-service:latest
     build: ./student-service
     container_name: student-service
     ports:
@@ -20,6 +22,7 @@ services:
       - student_data:/data
 
   internship:
+    image: internship-service:latest
     build: ./internship-service
     container_name: internship-service
     ports:
@@ -30,6 +33,7 @@ services:
       - internship_data:/data
 
   application:
+    image: application-service:latest
     build: ./application-service
     container_name: application-service
     ports:
