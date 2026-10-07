@@ -5,19 +5,10 @@ const API_URLS = {
   application: 'http://localhost:8004'
 };
 
-// State caches
-let studentsCache = [];
-let internshipsCache = [];
-let applicationsCache = [];
+let studentsList = [];
+let internshipsList = [];
+let applicationsList = [];
 
-// Lucide Icon Helper
-function refreshIcons() {
-  if (window.lucide && typeof lucide.createIcons === 'function') {
-    lucide.createIcons();
-  }
-}
-
-// Toast Notifications
 function showToast(message, type = 'success') {
   const container = document.getElementById('toast-container');
   if (!container) return;
@@ -25,112 +16,35 @@ function showToast(message, type = 'success') {
   toast.className = `toast toast-${type}`;
   toast.textContent = message;
   container.appendChild(toast);
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 250);
-  }, 4000);
+  setTimeout(() => toast.remove(), 3500);
 }
 
-// Modal Management
-function openModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) modal.classList.add('active');
-  if (modalId === 'modal-apply') populateAppDropdowns();
-}
-
-function closeModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) modal.classList.remove('active');
-}
-
-// Navigation & Tab Switching
+// Navigation between the 6 simple tabs
 function setupNavigation() {
-  const navItems = document.querySelectorAll('.nav-item');
-  navItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const tab = item.dataset.tab;
-      navigateToTab(tab);
+  const links = document.querySelectorAll('.nav-link');
+  links.forEach(link => {
+    link.addEventListener('click', () => {
+      links.forEach(l => l.classList.remove('active'));
+      document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+
+      link.classList.add('active');
+      const tab = link.dataset.tab;
+      const targetSec = document.getElementById(`sec-${tab}`);
+      if (targetSec) targetSec.classList.add('active');
+
+      if (tab === 'dashboard') loadDashboard();
+      if (tab === 'students') loadStudents();
+      if (tab === 'internships') loadInternships();
+      if (tab === 'applications') {
+        loadApplications();
+        populateAppDropdowns();
+      }
+      if (tab === 'health') checkServiceHealth();
     });
   });
 }
 
-function navigateToTab(tabName) {
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
-
-  const navItem = document.querySelector(`.nav-item[data-tab="${tabName}"]`);
-  if (navItem) navItem.classList.add('active');
-
-  const view = document.getElementById(`view-${tabName}`);
-  if (view) view.classList.add('active');
-
-  const breadcrumb = document.getElementById('header-breadcrumb');
-  if (breadcrumb) {
-    const titles = {
-      dashboard: 'Dashboard',
-      students: 'Students',
-      internships: 'Internships',
-      applications: 'Applications',
-      auth: 'Authentication',
-      'service-health': 'Service Health',
-      benchmarks: 'Benchmarks'
-    };
-    breadcrumb.textContent = titles[tabName] || tabName;
-  }
-
-  // Load view data
-  if (tabName === 'dashboard') loadDashboard();
-  if (tabName === 'students') loadStudents();
-  if (tabName === 'internships') loadInternships();
-  if (tabName === 'applications') loadApplications();
-  refreshIcons();
-}
-
-// Microservices Health Monitoring
-async function checkServiceHealth() {
-  const services = ['auth', 'student', 'internship', 'application'];
-  for (const s of services) {
-    const badge = document.getElementById(`badge-${s}`);
-    const healthBadge = document.getElementById(`health-${s}-badge`);
-    try {
-      const res = await fetch(`${API_URLS[s]}/`, { method: 'GET' });
-      if (res.ok) {
-        if (badge) badge.querySelector('.status-dot').className = 'status-dot online';
-        if (healthBadge) {
-          healthBadge.className = 'status-badge badge-accepted';
-          healthBadge.textContent = 'Online';
-        }
-      } else {
-        throw new Error();
-      }
-    } catch {
-      if (badge) badge.querySelector('.status-dot').className = 'status-dot offline';
-      if (healthBadge) {
-        healthBadge.className = 'status-badge badge-rejected';
-        healthBadge.textContent = 'Offline';
-      }
-    }
-  }
-}
-
-async function pingService(serviceName) {
-  try {
-    const start = performance.now();
-    const res = await fetch(`${API_URLS[serviceName]}/`);
-    const duration = Math.round(performance.now() - start);
-    if (res.ok) {
-      showToast(`${serviceName.toUpperCase()} service responded in ${duration} ms (200 OK)`);
-    } else {
-      showToast(`${serviceName.toUpperCase()} service error: ${res.status}`, 'error');
-    }
-  } catch (err) {
-    showToast(`Failed to reach ${serviceName.toUpperCase()} service`, 'error');
-  }
-}
-
-// ==========================================
-// 1. DASHBOARD MODULE
-// ==========================================
+// 1. DASHBOARD
 async function loadDashboard() {
   try {
     const [sRes, iRes, aRes] = await Promise.allSettled([
@@ -139,127 +53,64 @@ async function loadDashboard() {
       fetch(`${API_URLS.application}/applications`)
     ]);
 
-    studentsCache = sRes.status === 'fulfilled' && sRes.value.ok ? await sRes.value.json() : [];
-    internshipsCache = iRes.status === 'fulfilled' && iRes.value.ok ? await iRes.value.json() : [];
-    applicationsCache = aRes.status === 'fulfilled' && aRes.value.ok ? await aRes.value.json() : [];
+    studentsList = (sRes.status === 'fulfilled' && sRes.value.ok) ? await sRes.value.json() : [];
+    internshipsList = (iRes.status === 'fulfilled' && iRes.value.ok) ? await iRes.value.json() : [];
+    applicationsList = (aRes.status === 'fulfilled' && aRes.value.ok) ? await aRes.value.json() : [];
 
-    // Summary Cards
-    document.getElementById('stat-total-students').textContent = studentsCache.length;
-    document.getElementById('stat-total-internships').textContent = internshipsCache.length;
-    document.getElementById('stat-total-applications').textContent = applicationsCache.length;
+    document.getElementById('dash-total-students').textContent = studentsList.length;
+    document.getElementById('dash-total-internships').textContent = internshipsList.length;
+    document.getElementById('dash-total-applications').textContent = applicationsList.length;
 
-    const acceptedCount = applicationsCache.filter(a => a.status === 'accepted').length;
-    const rate = applicationsCache.length > 0 
-      ? Math.round((acceptedCount / applicationsCache.length) * 100) 
-      : 0;
-    document.getElementById('stat-acceptance-rate').textContent = `${rate}%`;
-
-    // Status Breakdown Bars
-    const pendingCount = applicationsCache.filter(a => a.status === 'pending').length;
-    const rejectedCount = applicationsCache.filter(a => a.status === 'rejected').length;
-    const totalApps = applicationsCache.length || 1;
-
-    document.getElementById('dash-count-pending').textContent = pendingCount;
-    document.getElementById('dash-count-accepted').textContent = acceptedCount;
-    document.getElementById('dash-count-rejected').textContent = rejectedCount;
-
-    document.getElementById('bar-pending').style.width = `${(pendingCount / totalApps) * 100}%`;
-    document.getElementById('bar-accepted').style.width = `${(acceptedCount / totalApps) * 100}%`;
-    document.getElementById('bar-rejected').style.width = `${(rejectedCount / totalApps) * 100}%`;
-
-    // Recent Applications List
-    const recentAppsTbody = document.getElementById('dash-recent-applications');
-    if (!applicationsCache || applicationsCache.length === 0) {
-      recentAppsTbody.innerHTML = '<tr><td colspan="4" class="empty-state">No submissions yet.</td></tr>';
-    } else {
-      const recent = applicationsCache.slice(-5).reverse();
-      recentAppsTbody.innerHTML = recent.map(a => {
-        const student = studentsCache.find(s => s.id === a.student_id);
-        const internship = internshipsCache.find(i => i.id === a.internship_id);
-        return `
-          <tr>
-            <td>#${a.id}</td>
-            <td><strong>${student ? escapeHtml(student.name) : 'Student #' + a.student_id}</strong></td>
-            <td>${internship ? escapeHtml(internship.title) : 'Internship #' + a.internship_id}</td>
-            <td><span class="status-badge badge-${a.status}">${a.status}</span></td>
-          </tr>
-        `;
-      }).join('');
+    const tbody = document.getElementById('dash-recent-tbody');
+    if (applicationsList.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No applications submitted yet.</td></tr>';
+      return;
     }
 
-    // Recent Internships List
-    const recentInternsTbody = document.getElementById('dash-recent-internships');
-    if (!internshipsCache || internshipsCache.length === 0) {
-      recentInternsTbody.innerHTML = '<tr><td colspan="4" class="empty-state">No active listings.</td></tr>';
-    } else {
-      const recentJobs = internshipsCache.slice(-4).reverse();
-      recentInternsTbody.innerHTML = recentJobs.map(job => `
+    const recent = applicationsList.slice(-5).reverse();
+    tbody.innerHTML = recent.map(a => {
+      const student = studentsList.find(s => s.id === a.student_id);
+      const internship = internshipsList.find(i => i.id === a.internship_id);
+      return `
         <tr>
-          <td><strong>${escapeHtml(job.title)}</strong></td>
-          <td>${escapeHtml(job.company)}</td>
-          <td>${escapeHtml(job.location || 'Remote')}</td>
-          <td>
-            <button class="btn btn-secondary btn-sm" onclick="triggerApplyFromList(${job.id})">Apply</button>
-          </td>
+          <td>#${a.id}</td>
+          <td>${student ? escapeHtml(student.name) : 'Student #' + a.student_id}</td>
+          <td>${internship ? escapeHtml(internship.title) : 'Internship #' + a.internship_id}</td>
+          <td><span class="badge badge-${a.status}">${a.status}</span></td>
         </tr>
-      `).join('');
-    }
-
-    // Department Stats
-    const countDept = (prefix) => studentsCache.filter(s => s.department && s.department.includes(prefix)).length;
-    document.getElementById('dept-count-cse').textContent = `${countDept('CSE')} Candidates`;
-    document.getElementById('dept-count-ise').textContent = `${countDept('ISE')} Candidates`;
-    document.getElementById('dept-count-ece').textContent = `${countDept('ECE')} Candidates`;
-    document.getElementById('dept-count-aids').textContent = `${countDept('AI')} Candidates`;
-
+      `;
+    }).join('');
   } catch (err) {
-    console.error('Error loading dashboard metrics', err);
+    console.error('Error loading dashboard', err);
   }
 }
 
-// ==========================================
-// 2. STUDENTS MODULE
-// ==========================================
+// 2. STUDENTS (Port 8002)
 async function loadStudents() {
   const tbody = document.getElementById('students-tbody');
-  tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Loading student directory...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Loading students...</td></tr>';
   try {
     const res = await fetch(`${API_URLS.student}/students`);
-    studentsCache = await res.json();
-    renderStudents(studentsCache);
-  } catch (err) {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="color:var(--danger-text);">Unable to reach Student Service (:8002).</td></tr>';
-  }
-}
-
-function renderStudents(list) {
-  const tbody = document.getElementById('students-tbody');
-  if (!list || list.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No student records found. Click "Add Student" to register.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = list.map(s => {
-    const initials = s.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'ST';
-    return `
+    studentsList = await res.json();
+    if (!studentsList || studentsList.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No students added yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = studentsList.map(s => `
       <tr>
-        <td><strong>#${s.id}</strong></td>
-        <td>
-          <div class="user-cell">
-            <div class="user-avatar">${initials}</div>
-            <div>
-              <div style="font-weight:600;color:var(--text-primary);">${escapeHtml(s.name)}</div>
-            </div>
-          </div>
-        </td>
+        <td>#${s.id}</td>
+        <td><strong>${escapeHtml(s.name)}</strong></td>
         <td>${escapeHtml(s.email)}</td>
-        <td><span class="dept-badge">${escapeHtml(s.department || 'N/A')}</span></td>
+        <td>${escapeHtml(s.department || '-')}</td>
         <td>Year ${s.year || 1}</td>
-        <td style="text-align:right;">
-          <button class="btn btn-danger-outline btn-sm" onclick="deleteStudent(${s.id})">Delete</button>
+        <td>
+          <button class="btn btn-danger btn-sm" onclick="deleteStudent(${s.id})">Delete</button>
         </td>
       </tr>
-    `;
-  }).join('');
+    `).join('');
+  } catch {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="color:#dc2626;">Student Service (:8002) offline.</td></tr>';
+  }
 }
 
 async function handleStudentSubmit(e) {
@@ -276,10 +127,9 @@ async function handleStudentSubmit(e) {
       body: JSON.stringify({ name, email, department, year })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Failed to create student');
-    showToast(`Student #${data.id} (${data.name}) registered successfully.`);
+    if (!res.ok) throw new Error(data.detail || 'Failed');
+    showToast(`Added student #${data.id} (${data.name})`);
     document.getElementById('student-form').reset();
-    closeModal('modal-student');
     loadStudents();
     loadDashboard();
   } catch (err) {
@@ -288,11 +138,11 @@ async function handleStudentSubmit(e) {
 }
 
 async function deleteStudent(id) {
-  if (!confirm(`Are you sure you want to remove student #${id}?`)) return;
+  if (!confirm(`Delete student #${id}?`)) return;
   try {
     const res = await fetch(`${API_URLS.student}/students/${id}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error('Delete operation failed');
-    showToast(`Student #${id} removed.`);
+    if (!res.ok) throw new Error('Delete failed');
+    showToast(`Deleted student #${id}`);
     loadStudents();
     loadDashboard();
   } catch (err) {
@@ -300,85 +150,36 @@ async function deleteStudent(id) {
   }
 }
 
-function handleFilterStudents() {
-  const query = document.getElementById('search-students').value.toLowerCase();
-  const dept = document.getElementById('filter-student-dept').value;
-
-  const filtered = studentsCache.filter(s => {
-    const matchesQuery = s.name.toLowerCase().includes(query) || 
-                         s.email.toLowerCase().includes(query) || 
-                         String(s.id).includes(query);
-    const matchesDept = !dept || (s.department && s.department.includes(dept));
-    return matchesQuery && matchesDept;
-  });
-  renderStudents(filtered);
-}
-
-// ==========================================
-// 3. INTERNSHIPS MODULE
-// ==========================================
+// 3. INTERNSHIPS (Port 8003)
 async function loadInternships() {
-  const container = document.getElementById('internships-container');
-  container.innerHTML = '<div class="empty-state">Loading active postings...</div>';
+  const tbody = document.getElementById('internships-tbody');
+  tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Loading internships...</td></tr>';
   try {
     const res = await fetch(`${API_URLS.internship}/internships`);
-    internshipsCache = await res.json();
-    renderInternships(internshipsCache);
-  } catch (err) {
-    container.innerHTML = '<div class="empty-state" style="color:var(--danger-text);">Unable to reach Internship Service (:8003).</div>';
+    internshipsList = await res.json();
+    renderInternships(internshipsList);
+  } catch {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state" style="color:#dc2626;">Internship Service (:8003) offline.</td></tr>';
   }
 }
 
 function renderInternships(list) {
-  const container = document.getElementById('internships-container');
+  const tbody = document.getElementById('internships-tbody');
   if (!list || list.length === 0) {
-    container.innerHTML = '<div class="empty-state">No internship opportunities listed. Click "Post Internship" to publish.</div>';
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No internships listed yet.</td></tr>';
     return;
   }
-
-  container.innerHTML = list.map(item => {
-    // Generate clean skill tags from description
-    const text = (item.title + ' ' + (item.description || '')).toLowerCase();
-    const possibleSkills = ['Python', 'Docker', 'FastAPI', 'SQL', 'React', 'Cloud', 'Machine Learning', 'API'];
-    const tags = possibleSkills.filter(skill => text.includes(skill.toLowerCase()));
-    if (tags.length === 0) tags.push('Technical Internship', 'University Pool');
-
-    return `
-      <div class="internship-card">
-        <div>
-          <div class="internship-top">
-            <div class="company-title-wrap">
-              <h3>${escapeHtml(item.title)}</h3>
-              <div class="company-sub">${escapeHtml(item.company)}</div>
-            </div>
-            <span class="dept-badge">#${item.id}</span>
-          </div>
-
-          <div class="internship-location">
-            <i data-lucide="map-pin" style="width:13px;height:13px;"></i>
-            <span>${escapeHtml(item.location || 'Remote')}</span>
-          </div>
-
-          <div class="internship-desc">
-            ${escapeHtml(item.description || 'No detailed job description provided.')}
-          </div>
-
-          <div class="skill-tags">
-            ${tags.map(t => `<span class="skill-tag">${t}</span>`).join('')}
-          </div>
-        </div>
-
-        <div class="internship-actions">
-          <button class="btn btn-secondary btn-sm" onclick="viewInternshipDetails(${item.id})">View Details</button>
-          <div style="display:flex;gap:6px;">
-            <button class="btn btn-primary btn-sm" onclick="triggerApplyFromList(${item.id})">Apply</button>
-            <button class="btn btn-danger-outline btn-sm" onclick="deleteInternship(${item.id})">Delete</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
-  refreshIcons();
+  tbody.innerHTML = list.map(item => `
+    <tr>
+      <td>#${item.id}</td>
+      <td><strong>${escapeHtml(item.title)}</strong></td>
+      <td>${escapeHtml(item.company)}</td>
+      <td>${escapeHtml(item.location || 'Remote')}</td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="deleteInternship(${item.id})">Delete</button>
+      </td>
+    </tr>
+  `).join('');
 }
 
 async function handleInternshipSubmit(e) {
@@ -395,10 +196,9 @@ async function handleInternshipSubmit(e) {
       body: JSON.stringify({ title, company, location, description })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Failed to post role');
-    showToast(`Published role "${data.title}" at ${data.company}.`);
+    if (!res.ok) throw new Error(data.detail || 'Failed');
+    showToast(`Added internship #${data.id} (${data.title})`);
     document.getElementById('internship-form').reset();
-    closeModal('modal-internship');
     loadInternships();
     loadDashboard();
   } catch (err) {
@@ -411,7 +211,7 @@ async function deleteInternship(id) {
   try {
     const res = await fetch(`${API_URLS.internship}/internships/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Delete failed');
-    showToast(`Internship #${id} deleted.`);
+    showToast(`Deleted internship #${id}`);
     loadInternships();
     loadDashboard();
   } catch (err) {
@@ -419,55 +219,17 @@ async function deleteInternship(id) {
   }
 }
 
-function handleFilterInternships() {
-  const query = document.getElementById('search-internships').value.toLowerCase();
-  const locFilter = document.getElementById('filter-internship-loc').value.toLowerCase();
-
-  const filtered = internshipsCache.filter(item => {
-    const matchesQuery = item.title.toLowerCase().includes(query) ||
-                         item.company.toLowerCase().includes(query) ||
-                         (item.description && item.description.toLowerCase().includes(query));
-    const matchesLoc = !locFilter || (item.location && item.location.toLowerCase().includes(locFilter));
-    return matchesQuery && matchesLoc;
-  });
+function handleSearchInternships(e) {
+  const q = e.target.value.toLowerCase();
+  const filtered = internshipsList.filter(i => 
+    i.title.toLowerCase().includes(q) ||
+    i.company.toLowerCase().includes(q) ||
+    (i.location && i.location.toLowerCase().includes(q))
+  );
   renderInternships(filtered);
 }
 
-function viewInternshipDetails(id) {
-  const item = internshipsCache.find(i => i.id === id);
-  if (!item) return;
-  document.getElementById('details-modal-title').textContent = item.title;
-  document.getElementById('details-modal-body').innerHTML = `
-    <div style="margin-bottom:12px;">
-      <div style="font-weight:600;font-size:14px;color:var(--text-primary);">${escapeHtml(item.company)}</div>
-      <div style="color:var(--text-muted);font-size:12px;">Location: ${escapeHtml(item.location || 'Remote')} &bull; Position Ref: #${item.id}</div>
-    </div>
-    <div style="background:var(--bg-surface-subtle);padding:12px;border-radius:var(--radius-md);margin-bottom:12px;border:1px solid var(--border-color);">
-      <strong>Role Overview & Scope:</strong>
-      <p style="margin-top:6px;color:var(--text-secondary);">${escapeHtml(item.description || 'No description provided.')}</p>
-    </div>
-    <div style="font-size:12px;color:var(--text-muted);">
-      Microservice Container: <code>internship-service (:8003)</code> &bull; Persistent DB: <code>internships.db</code>
-    </div>
-  `;
-  document.getElementById('details-apply-btn').onclick = () => {
-    closeModal('modal-details');
-    triggerApplyFromList(item.id);
-  };
-  openModal('modal-details');
-}
-
-function triggerApplyFromList(internshipId) {
-  openModal('modal-apply');
-  setTimeout(() => {
-    const select = document.getElementById('apply-internship-id');
-    if (select) select.value = internshipId;
-  }, 100);
-}
-
-// ==========================================
-// 4. APPLICATIONS MODULE
-// ==========================================
+// 4. APPLICATIONS (Port 8004)
 async function populateAppDropdowns() {
   const studentSelect = document.getElementById('apply-student-id');
   const internshipSelect = document.getElementById('apply-internship-id');
@@ -477,14 +239,14 @@ async function populateAppDropdowns() {
       fetch(`${API_URLS.student}/students`),
       fetch(`${API_URLS.internship}/internships`)
     ]);
-    studentsCache = await sRes.json();
-    internshipsCache = await iRes.json();
+    studentsList = await sRes.json();
+    internshipsList = await iRes.json();
 
-    studentSelect.innerHTML = '<option value="">Select Enrolled Student...</option>' + 
-      studentsCache.map(s => `<option value="${s.id}">#${s.id} - ${escapeHtml(s.name)} (${s.department || 'General'})</option>`).join('');
+    studentSelect.innerHTML = '<option value="">Select Student...</option>' + 
+      studentsList.map(s => `<option value="${s.id}">#${s.id} - ${escapeHtml(s.name)}</option>`).join('');
 
-    internshipSelect.innerHTML = '<option value="">Select Position...</option>' + 
-      internshipsCache.map(i => `<option value="${i.id}">#${i.id} - ${escapeHtml(i.title)} at ${escapeHtml(i.company)}</option>`).join('');
+    internshipSelect.innerHTML = '<option value="">Select Internship...</option>' + 
+      internshipsList.map(i => `<option value="${i.id}">#${i.id} - ${escapeHtml(i.title)} (${escapeHtml(i.company)})</option>`).join('');
   } catch (err) {
     console.error('Error populating dropdowns', err);
   }
@@ -492,58 +254,44 @@ async function populateAppDropdowns() {
 
 async function loadApplications() {
   const tbody = document.getElementById('applications-tbody');
-  tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Loading application records...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Loading applications...</td></tr>';
   try {
     const [aRes, sRes, iRes] = await Promise.all([
       fetch(`${API_URLS.application}/applications`),
       fetch(`${API_URLS.student}/students`),
       fetch(`${API_URLS.internship}/internships`)
     ]);
-    applicationsCache = await aRes.json();
-    studentsCache = await sRes.json();
-    internshipsCache = await iRes.json();
+    applicationsList = await aRes.json();
+    studentsList = await sRes.json();
+    internshipsList = await iRes.json();
 
-    renderApplications(applicationsCache);
-  } catch (err) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty-state" style="color:var(--danger-text);">Unable to reach Application Service (:8004).</td></tr>';
+    if (!applicationsList || applicationsList.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No applications submitted.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = applicationsList.map(a => {
+      const student = studentsList.find(s => s.id === a.student_id);
+      const internship = internshipsList.find(i => i.id === a.internship_id);
+      return `
+        <tr>
+          <td>#${a.id}</td>
+          <td>${student ? escapeHtml(student.name) : 'Student #' + a.student_id}</td>
+          <td>${internship ? escapeHtml(internship.title) + ' (' + escapeHtml(internship.company) + ')' : 'Internship #' + a.internship_id}</td>
+          <td><span class="badge badge-${a.status}">${a.status}</span></td>
+          <td>
+            <div style="display:inline-flex;gap:4px;">
+              <button class="btn btn-secondary btn-sm" onclick="updateAppStatus(${a.id}, 'accepted')">Accept</button>
+              <button class="btn btn-secondary btn-sm" onclick="updateAppStatus(${a.id}, 'rejected')">Reject</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteApplication(${a.id})">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state" style="color:#dc2626;">Application Service (:8004) offline.</td></tr>';
   }
-}
-
-function renderApplications(list) {
-  const tbody = document.getElementById('applications-tbody');
-  if (!list || list.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No applications submitted yet.</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = list.map(a => {
-    const student = studentsCache.find(s => s.id === a.student_id);
-    const internship = internshipsCache.find(i => i.id === a.internship_id);
-
-    return `
-      <tr>
-        <td><strong>#${a.id}</strong></td>
-        <td>
-          <div style="font-weight:600;color:var(--text-primary);">${student ? escapeHtml(student.name) : 'Student #' + a.student_id}</div>
-          <div style="font-size:11px;color:var(--text-muted);">${student ? escapeHtml(student.email) : 'ID: ' + a.student_id}</div>
-        </td>
-        <td>
-          <div style="font-weight:600;color:var(--text-primary);">${internship ? escapeHtml(internship.title) : 'Internship #' + a.internship_id}</div>
-          <div style="font-size:11px;color:var(--text-muted);">${internship ? escapeHtml(internship.company) : 'Position Ref #' + a.internship_id}</div>
-        </td>
-        <td>
-          <span class="status-badge badge-${a.status}">${a.status}</span>
-        </td>
-        <td style="text-align:right;">
-          <div style="display:inline-flex;gap:4px;">
-            <button class="btn btn-success-outline btn-sm" onclick="updateAppStatus(${a.id}, 'accepted')">Accept</button>
-            <button class="btn btn-secondary btn-sm" onclick="updateAppStatus(${a.id}, 'rejected')">Reject</button>
-            <button class="btn btn-danger-outline btn-sm" onclick="deleteApplication(${a.id})">Delete</button>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
 }
 
 async function handleApplySubmit(e) {
@@ -552,7 +300,7 @@ async function handleApplySubmit(e) {
   const internship_id = parseInt(document.getElementById('apply-internship-id').value);
 
   if (!student_id || !internship_id) {
-    showToast('Please select both a student and an internship position.', 'error');
+    showToast('Please select both student and internship', 'error');
     return;
   }
 
@@ -563,9 +311,38 @@ async function handleApplySubmit(e) {
       body: JSON.stringify({ student_id, internship_id })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Application submission failed');
-    showToast(`Application #${data.id} submitted successfully.`);
-    closeModal('modal-apply');
+    if (!res.ok) throw new Error(data.detail || 'Application failed');
+    showToast(`Application #${data.id} submitted!`);
+    loadApplications();
+    loadDashboard();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function updateAppStatus(id, status) {
+  try {
+    const res = await fetch(`${API_URLS.application}/applications/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Failed');
+    showToast(`Application #${id} status: ${status}`);
+    loadApplications();
+    loadDashboard();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function deleteApplication(id) {
+  if (!confirm(`Delete application #${id}?`)) return;
+  try {
+    const res = await fetch(`${API_URLS.application}/applications/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Delete failed');
+    showToast(`Deleted application #${id}`);
     loadApplications();
     loadDashboard();
   } catch (err) {
@@ -583,7 +360,7 @@ async function testInvalidStudentDemo() {
     });
     const data = await res.json();
     if (!res.ok) {
-      alert(`[Checkpoint 3 Inter-Service Communication Verified]\n\nResponse Status: ${res.status}\nMessage: "${data.detail}"\n\nExplanation for Evaluator:\nApplication Service (:8004) sent an internal HTTP request across the Docker bridge network to Student Service (:8002) to verify student existence.\nBecause student #99999 was not found, the application was safely rejected.`);
+      alert(`[Checkpoint 3 Inter-Service Validation Demo]\n\nResponse: ${res.status} Not Found\nMessage: "${data.detail}"\n\nExplanation for Evaluator:\nApplication Service (:8004) contacted Student Service (:8002) over the internal Docker network. Because student #99999 does not exist, the submission was rejected.`);
     } else {
       showToast('Unexpected success for invalid student', 'error');
     }
@@ -592,91 +369,25 @@ async function testInvalidStudentDemo() {
   }
 }
 
-async function updateAppStatus(id, status) {
-  try {
-    const res = await fetch(`${API_URLS.application}/applications/${id}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Failed to update status');
-    showToast(`Application #${id} status updated to ${status}.`);
-    loadApplications();
-    loadDashboard();
-  } catch (err) {
-    showToast(err.message, 'error');
-  }
-}
-
-async function deleteApplication(id) {
-  if (!confirm(`Delete application #${id}?`)) return;
-  try {
-    const res = await fetch(`${API_URLS.application}/applications/${id}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error('Delete failed');
-    showToast(`Application #${id} removed.`);
-    loadApplications();
-    loadDashboard();
-  } catch (err) {
-    showToast(err.message, 'error');
-  }
-}
-
-function handleFilterApplications() {
-  const query = document.getElementById('search-applications').value.toLowerCase();
-  const status = document.getElementById('filter-app-status').value;
-
-  const filtered = applicationsCache.filter(a => {
-    const matchesStatus = !status || a.status === status;
-    const matchesQuery = String(a.id).includes(query) || 
-                         String(a.student_id).includes(query) || 
-                         String(a.internship_id).includes(query);
-    return matchesStatus && matchesQuery;
-  });
-  renderApplications(filtered);
-}
-
-// ==========================================
-// 5. AUTHENTICATION MODULE
-// ==========================================
-async function handleAuthRegister(e) {
-  e.preventDefault();
-  const name = document.getElementById('auth-name').value.trim();
-  const email = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-pass').value;
-
-  try {
-    const res = await fetch(`${API_URLS.auth}/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Registration failed');
-    showToast(`User account created: ${data.name} (${data.email})`);
-    document.getElementById('auth-reg-form').reset();
-  } catch (err) {
-    showToast(err.message, 'error');
-  }
-}
-
-async function handleAuthLogin(e) {
-  e.preventDefault();
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-pass').value;
-
-  try {
-    const res = await fetch(`${API_URLS.auth}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Login failed');
-    showToast(`Login successful. User ID: #${data.user_id}`);
-    document.getElementById('auth-login-form').reset();
-  } catch (err) {
-    showToast(err.message, 'error');
+// 6. SERVICE HEALTH
+async function checkServiceHealth() {
+  const services = ['auth', 'student', 'internship', 'application'];
+  for (const s of services) {
+    const el = document.getElementById(`status-${s}`);
+    if (!el) continue;
+    try {
+      const res = await fetch(`${API_URLS[s]}/`);
+      if (res.ok) {
+        el.className = 'badge badge-online';
+        el.textContent = 'Online';
+      } else {
+        el.className = 'badge badge-offline';
+        el.textContent = 'Error';
+      }
+    } catch {
+      el.className = 'badge badge-offline';
+      el.textContent = 'Offline';
+    }
   }
 }
 
@@ -689,28 +400,13 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-// Initialization
 document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
   checkServiceHealth();
-  setInterval(checkServiceHealth, 10000);
+  loadDashboard();
 
-  // Forms
   document.getElementById('student-form')?.addEventListener('submit', handleStudentSubmit);
   document.getElementById('internship-form')?.addEventListener('submit', handleInternshipSubmit);
   document.getElementById('apply-form')?.addEventListener('submit', handleApplySubmit);
-  document.getElementById('auth-reg-form')?.addEventListener('submit', handleAuthRegister);
-  document.getElementById('auth-login-form')?.addEventListener('submit', handleAuthLogin);
-
-  // Search & Filter listeners
-  document.getElementById('search-students')?.addEventListener('input', handleFilterStudents);
-  document.getElementById('filter-student-dept')?.addEventListener('change', handleFilterStudents);
-  document.getElementById('search-internships')?.addEventListener('input', handleFilterInternships);
-  document.getElementById('filter-internship-loc')?.addEventListener('change', handleFilterInternships);
-  document.getElementById('search-applications')?.addEventListener('input', handleFilterApplications);
-  document.getElementById('filter-app-status')?.addEventListener('change', handleFilterApplications);
-
-  // Initial load
-  loadDashboard();
-  refreshIcons();
+  document.getElementById('search-internships')?.addEventListener('input', handleSearchInternships);
 });
