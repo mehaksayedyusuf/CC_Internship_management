@@ -9,6 +9,7 @@ let studentsList = [];
 let internshipsList = [];
 let applicationsList = [];
 
+// Toast Notifications
 function showToast(message, type = 'success') {
   const container = document.getElementById('toast-container');
   if (!container) return;
@@ -16,10 +17,28 @@ function showToast(message, type = 'success') {
   toast.className = `toast toast-${type}`;
   toast.textContent = message;
   container.appendChild(toast);
-  setTimeout(() => toast.remove(), 3500);
+  setTimeout(() => toast.remove(), 3200);
 }
 
-// Navigation between the 6 simple tabs
+// Modal Helpers
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.add('active');
+    if (id === 'modal-application') {
+      populateAppDropdowns();
+    }
+  }
+}
+
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.remove('active');
+  }
+}
+
+// Navigation between sections
 function setupNavigation() {
   const links = document.querySelectorAll('.nav-link');
   links.forEach(link => {
@@ -35,10 +54,7 @@ function setupNavigation() {
       if (tab === 'dashboard') loadDashboard();
       if (tab === 'students') loadStudents();
       if (tab === 'internships') loadInternships();
-      if (tab === 'applications') {
-        loadApplications();
-        populateAppDropdowns();
-      }
+      if (tab === 'applications') loadApplications();
       if (tab === 'health') checkServiceHealth();
     });
   });
@@ -51,7 +67,9 @@ function switchToTab(tab) {
   }
 }
 
+// ==============================================================================
 // 1. DASHBOARD
+// ==============================================================================
 async function loadDashboard() {
   try {
     const [sRes, iRes, aRes] = await Promise.allSettled([
@@ -68,7 +86,7 @@ async function loadDashboard() {
     document.getElementById('dash-total-internships').textContent = internshipsList.length;
     document.getElementById('dash-total-applications').textContent = applicationsList.length;
 
-    // Recent Applications
+    // Recent Applications Table (Latest 5)
     const tbody = document.getElementById('dash-recent-tbody');
     if (applicationsList.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No applications submitted yet.</td></tr>';
@@ -79,16 +97,16 @@ async function loadDashboard() {
         const internship = internshipsList.find(i => i.id === a.internship_id);
         return `
           <tr>
-            <td>#${a.id}</td>
-            <td>${student ? escapeHtml(student.name) : 'Student #' + a.student_id}</td>
-            <td>${internship ? escapeHtml(internship.title) : 'Internship #' + a.internship_id}</td>
+            <td class="cell-muted">#${a.id}</td>
+            <td class="cell-bold">${student ? escapeHtml(student.name) : 'Student #' + a.student_id}</td>
+            <td>${internship ? escapeHtml(internship.title) + ' &bull; ' + escapeHtml(internship.company) : 'Internship #' + a.internship_id}</td>
             <td><span class="badge badge-${a.status}">${a.status}</span></td>
           </tr>
         `;
       }).join('');
     }
 
-    // Recent Internships (show only latest 3)
+    // Recent Internships (Latest 3)
     const iTbody = document.getElementById('dash-recent-internships-tbody');
     if (internshipsList.length === 0) {
       iTbody.innerHTML = '<tr><td colspan="4" class="empty-state">No internships listed yet.</td></tr>';
@@ -96,10 +114,10 @@ async function loadDashboard() {
       const recentInternships = internshipsList.slice(-3).reverse();
       iTbody.innerHTML = recentInternships.map(i => `
         <tr>
-          <td><strong>${escapeHtml(i.title)}</strong></td>
+          <td class="cell-bold">${escapeHtml(i.title)}</td>
           <td>${escapeHtml(i.company)}</td>
           <td>${escapeHtml(i.location || 'Remote')}</td>
-          <td>
+          <td style="text-align: right;">
             <button class="btn btn-secondary btn-sm" onclick="switchToTab('internships')">View</button>
           </td>
         </tr>
@@ -110,32 +128,49 @@ async function loadDashboard() {
   }
 }
 
+// ==============================================================================
 // 2. STUDENTS (Port 8002)
+// ==============================================================================
 async function loadStudents() {
   const tbody = document.getElementById('students-tbody');
   tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Loading students...</td></tr>';
   try {
     const res = await fetch(`${API_URLS.student}/students`);
     studentsList = await res.json();
-    if (!studentsList || studentsList.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No students added yet.</td></tr>';
-      return;
-    }
-    tbody.innerHTML = studentsList.map(s => `
-      <tr>
-        <td>#${s.id}</td>
-        <td><strong>${escapeHtml(s.name)}</strong></td>
-        <td>${escapeHtml(s.email)}</td>
-        <td>${escapeHtml(s.department || '-')}</td>
-        <td>Year ${s.year || 1}</td>
-        <td>
-          <button class="btn btn-danger btn-sm" onclick="deleteStudent(${s.id})">Delete</button>
-        </td>
-      </tr>
-    `).join('');
+    renderStudents(studentsList);
   } catch {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="color:#dc2626;">Student Service (:8002) offline.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="color:var(--status-error);">Student Service (:8002) offline.</td></tr>';
   }
+}
+
+function renderStudents(list) {
+  const tbody = document.getElementById('students-tbody');
+  if (!list || list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No students found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(s => `
+    <tr>
+      <td class="cell-muted">#${s.id}</td>
+      <td class="cell-bold">${escapeHtml(s.name)}</td>
+      <td>${escapeHtml(s.email)}</td>
+      <td><span class="dept-tag">${escapeHtml(s.department || '-')}</span></td>
+      <td>Year ${s.year || 1}</td>
+      <td style="text-align: right;">
+        <button class="btn btn-danger btn-sm" onclick="deleteStudent(${s.id})">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function handleSearchStudents(e) {
+  const q = e.target.value.toLowerCase().trim();
+  const filtered = studentsList.filter(s =>
+    s.name.toLowerCase().includes(q) ||
+    s.email.toLowerCase().includes(q) ||
+    (s.department && s.department.toLowerCase().includes(q))
+  );
+  renderStudents(filtered);
 }
 
 async function handleStudentSubmit(e) {
@@ -152,9 +187,10 @@ async function handleStudentSubmit(e) {
       body: JSON.stringify({ name, email, department, year })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Failed');
+    if (!res.ok) throw new Error(data.detail || 'Failed to add student');
     showToast(`Added student #${data.id} (${data.name})`);
     document.getElementById('student-form').reset();
+    closeModal('modal-student');
     loadStudents();
     loadDashboard();
   } catch (err) {
@@ -163,7 +199,7 @@ async function handleStudentSubmit(e) {
 }
 
 async function deleteStudent(id) {
-  if (!confirm(`Delete student #${id}?`)) return;
+  if (!confirm(`Delete student record #${id}?`)) return;
   try {
     const res = await fetch(`${API_URLS.student}/students/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Delete failed');
@@ -175,36 +211,50 @@ async function deleteStudent(id) {
   }
 }
 
+// ==============================================================================
 // 3. INTERNSHIPS (Port 8003)
+// ==============================================================================
 async function loadInternships() {
   const tbody = document.getElementById('internships-tbody');
-  tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Loading internships...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Loading internships...</td></tr>';
   try {
     const res = await fetch(`${API_URLS.internship}/internships`);
     internshipsList = await res.json();
     renderInternships(internshipsList);
   } catch {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty-state" style="color:#dc2626;">Internship Service (:8003) offline.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="color:var(--status-error);">Internship Service (:8003) offline.</td></tr>';
   }
 }
 
 function renderInternships(list) {
   const tbody = document.getElementById('internships-tbody');
   if (!list || list.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No internships listed yet.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No internships listed yet.</td></tr>';
     return;
   }
   tbody.innerHTML = list.map(item => `
     <tr>
-      <td>#${item.id}</td>
-      <td><strong>${escapeHtml(item.title)}</strong></td>
+      <td class="cell-muted">#${item.id}</td>
+      <td class="cell-bold">${escapeHtml(item.title)}</td>
       <td>${escapeHtml(item.company)}</td>
-      <td>${escapeHtml(item.location || 'Remote')}</td>
-      <td>
+      <td><span class="dept-tag">${escapeHtml(item.location || 'Remote')}</span></td>
+      <td class="cell-desc">${escapeHtml(item.description || 'No description provided')}</td>
+      <td style="text-align: right;">
         <button class="btn btn-danger btn-sm" onclick="deleteInternship(${item.id})">Delete</button>
       </td>
     </tr>
   `).join('');
+}
+
+function handleSearchInternships(e) {
+  const q = e.target.value.toLowerCase().trim();
+  const filtered = internshipsList.filter(i => 
+    i.title.toLowerCase().includes(q) ||
+    i.company.toLowerCase().includes(q) ||
+    (i.location && i.location.toLowerCase().includes(q)) ||
+    (i.description && i.description.toLowerCase().includes(q))
+  );
+  renderInternships(filtered);
 }
 
 async function handleInternshipSubmit(e) {
@@ -221,9 +271,10 @@ async function handleInternshipSubmit(e) {
       body: JSON.stringify({ title, company, location, description })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Failed');
+    if (!res.ok) throw new Error(data.detail || 'Failed to add internship');
     showToast(`Added internship #${data.id} (${data.title})`);
     document.getElementById('internship-form').reset();
+    closeModal('modal-internship');
     loadInternships();
     loadDashboard();
   } catch (err) {
@@ -232,7 +283,7 @@ async function handleInternshipSubmit(e) {
 }
 
 async function deleteInternship(id) {
-  if (!confirm(`Delete internship #${id}?`)) return;
+  if (!confirm(`Delete internship posting #${id}?`)) return;
   try {
     const res = await fetch(`${API_URLS.internship}/internships/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Delete failed');
@@ -244,17 +295,9 @@ async function deleteInternship(id) {
   }
 }
 
-function handleSearchInternships(e) {
-  const q = e.target.value.toLowerCase();
-  const filtered = internshipsList.filter(i => 
-    i.title.toLowerCase().includes(q) ||
-    i.company.toLowerCase().includes(q) ||
-    (i.location && i.location.toLowerCase().includes(q))
-  );
-  renderInternships(filtered);
-}
-
+// ==============================================================================
 // 4. APPLICATIONS (Port 8004)
+// ==============================================================================
 async function populateAppDropdowns() {
   const studentSelect = document.getElementById('apply-student-id');
   const internshipSelect = document.getElementById('apply-internship-id');
@@ -268,12 +311,12 @@ async function populateAppDropdowns() {
     internshipsList = await iRes.json();
 
     studentSelect.innerHTML = '<option value="">Select Student...</option>' + 
-      studentsList.map(s => `<option value="${s.id}">#${s.id} - ${escapeHtml(s.name)}</option>`).join('');
+      studentsList.map(s => `<option value="${s.id}">#${s.id} - ${escapeHtml(s.name)} (${escapeHtml(s.department || 'N/A')})</option>`).join('');
 
     internshipSelect.innerHTML = '<option value="">Select Internship...</option>' + 
-      internshipsList.map(i => `<option value="${i.id}">#${i.id} - ${escapeHtml(i.title)} (${escapeHtml(i.company)})</option>`).join('');
+      internshipsList.map(i => `<option value="${i.id}">#${i.id} - ${escapeHtml(i.title)} at ${escapeHtml(i.company)}</option>`).join('');
   } catch (err) {
-    console.error('Error populating dropdowns', err);
+    console.error('Error populating application dropdowns', err);
   }
 }
 
@@ -289,34 +332,38 @@ async function loadApplications() {
     applicationsList = await aRes.json();
     studentsList = await sRes.json();
     internshipsList = await iRes.json();
-
-    if (!applicationsList || applicationsList.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No applications submitted.</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = applicationsList.map(a => {
-      const student = studentsList.find(s => s.id === a.student_id);
-      const internship = internshipsList.find(i => i.id === a.internship_id);
-      return `
-        <tr>
-          <td>#${a.id}</td>
-          <td>${student ? escapeHtml(student.name) : 'Student #' + a.student_id}</td>
-          <td>${internship ? escapeHtml(internship.title) + ' (' + escapeHtml(internship.company) + ')' : 'Internship #' + a.internship_id}</td>
-          <td><span class="badge badge-${a.status}">${a.status}</span></td>
-          <td>
-            <div style="display:inline-flex;gap:4px;">
-              <button class="btn btn-secondary btn-sm" onclick="updateAppStatus(${a.id}, 'accepted')">Accept</button>
-              <button class="btn btn-secondary btn-sm" onclick="updateAppStatus(${a.id}, 'rejected')">Reject</button>
-              <button class="btn btn-danger btn-sm" onclick="deleteApplication(${a.id})">Delete</button>
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
+    renderApplications(applicationsList);
   } catch {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty-state" style="color:#dc2626;">Application Service (:8004) offline.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state" style="color:var(--status-error);">Application Service (:8004) offline.</td></tr>';
   }
+}
+
+function renderApplications(list) {
+  const tbody = document.getElementById('applications-tbody');
+  if (!list || list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No applications submitted yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = list.map(a => {
+    const student = studentsList.find(s => s.id === a.student_id);
+    const internship = internshipsList.find(i => i.id === a.internship_id);
+    return `
+      <tr>
+        <td class="cell-muted">#${a.id}</td>
+        <td class="cell-bold">${student ? escapeHtml(student.name) : 'Student #' + a.student_id}</td>
+        <td>${internship ? escapeHtml(internship.title) + ' &bull; ' + escapeHtml(internship.company) : 'Internship #' + a.internship_id}</td>
+        <td><span class="badge badge-${a.status}">${a.status}</span></td>
+        <td style="text-align: right;">
+          <div style="display: inline-flex; gap: 6px;">
+            <button class="btn btn-secondary btn-sm" onclick="updateAppStatus(${a.id}, 'accepted')">Accept</button>
+            <button class="btn btn-secondary btn-sm" onclick="updateAppStatus(${a.id}, 'rejected')">Reject</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteApplication(${a.id})">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 async function handleApplySubmit(e) {
@@ -325,7 +372,7 @@ async function handleApplySubmit(e) {
   const internship_id = parseInt(document.getElementById('apply-internship-id').value);
 
   if (!student_id || !internship_id) {
-    showToast('Please select both student and internship', 'error');
+    showToast('Please select both a student and an internship opportunity', 'error');
     return;
   }
 
@@ -336,8 +383,10 @@ async function handleApplySubmit(e) {
       body: JSON.stringify({ student_id, internship_id })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Application failed');
-    showToast(`Application #${data.id} submitted!`);
+    if (!res.ok) throw new Error(data.detail || 'Application submission failed');
+    showToast(`Application #${data.id} submitted successfully!`);
+    document.getElementById('apply-form').reset();
+    closeModal('modal-application');
     loadApplications();
     loadDashboard();
   } catch (err) {
@@ -354,7 +403,7 @@ async function updateAppStatus(id, status) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || 'Failed');
-    showToast(`Application #${id} status: ${status}`);
+    showToast(`Application #${id} updated to ${status}`);
     loadApplications();
     loadDashboard();
   } catch (err) {
@@ -385,7 +434,7 @@ async function testInvalidStudentDemo() {
     });
     const data = await res.json();
     if (!res.ok) {
-      alert(`[Checkpoint 3 Inter-Service Validation Demo]\n\nResponse: ${res.status} Not Found\nMessage: "${data.detail}"\n\nExplanation for Evaluator:\nApplication Service (:8004) contacted Student Service (:8002) over the internal Docker network. Because student #99999 does not exist, the submission was rejected.`);
+      alert(`[Checkpoint 3 Inter-Service Validation Demo]\n\nResponse: ${res.status} Not Found\nMessage: "${data.detail}"\n\nExplanation for Evaluator:\nApplication Service (:8004) contacted Student Service (:8002) over the internal Docker network. Because student #99999 does not exist, the submission was safely rejected.`);
     } else {
       showToast('Unexpected success for invalid student', 'error');
     }
@@ -394,7 +443,9 @@ async function testInvalidStudentDemo() {
   }
 }
 
+// ==============================================================================
 // 6. SERVICE HEALTH
+// ==============================================================================
 async function checkServiceHealth() {
   const services = ['auth', 'student', 'internship', 'application'];
   for (const s of services) {
@@ -425,6 +476,7 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
+// Global Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
   checkServiceHealth();
@@ -433,5 +485,22 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('student-form')?.addEventListener('submit', handleStudentSubmit);
   document.getElementById('internship-form')?.addEventListener('submit', handleInternshipSubmit);
   document.getElementById('apply-form')?.addEventListener('submit', handleApplySubmit);
+  
+  document.getElementById('search-students')?.addEventListener('input', handleSearchStudents);
   document.getElementById('search-internships')?.addEventListener('input', handleSearchInternships);
+
+  // Close modals on Escape key or backdrop click
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+    }
+  });
+
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+      }
+    });
+  });
 });

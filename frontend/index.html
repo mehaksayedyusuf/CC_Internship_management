@@ -13,7 +13,7 @@
 
   <div class="app-container">
     
-    <!-- Left Navigation -->
+    <!-- Left Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
         <div class="brand-logo">IMS</div>
@@ -25,14 +25,38 @@
 
       <nav class="sidebar-nav">
         <div class="nav-section-title">MAIN</div>
-        <div class="nav-link active" data-tab="dashboard">Dashboard</div>
-        <div class="nav-link" data-tab="students">Students</div>
-        <div class="nav-link" data-tab="internships">Internships</div>
-        <div class="nav-link" data-tab="applications">Applications</div>
+        
+        <div class="nav-link active" data-tab="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          Dashboard
+        </div>
+        
+        <div class="nav-link" data-tab="students">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Students
+        </div>
+        
+        <div class="nav-link" data-tab="internships">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+          Internships
+        </div>
+        
+        <div class="nav-link" data-tab="applications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+          Applications
+        </div>
 
         <div class="nav-section-title">SYSTEM</div>
-        <div class="nav-link" data-tab="benchmarks">Benchmarks</div>
-        <div class="nav-link" data-tab="health">Service Health</div>
+        
+        <div class="nav-link" data-tab="benchmarks">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          Benchmarks
+        </div>
+        
+        <div class="nav-link" data-tab="health">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Service Health
+        </div>
       </nav>
     </aside>
 
@@ -43,36 +67,43 @@
       <!-- 1. DASHBOARD -->
       <!-- ========================================== -->
       <section class="page-section active" id="sec-dashboard">
-        <h2 class="page-title">Dashboard</h2>
-        <p class="page-subtitle">Overview of students, internships, and submitted applications</p>
-
-        <!-- Stats Row: Exactly 3 metrics -->
-        <div class="stats-row">
-          <div class="stat-box">
-            <div class="stat-box-title">Total Students</div>
-            <div class="stat-box-number" id="dash-total-students">0</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-box-title">Total Internships</div>
-            <div class="stat-box-number" id="dash-total-internships">0</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-box-title">Total Applications</div>
-            <div class="stat-box-number" id="dash-total-applications">0</div>
+        <div class="page-header">
+          <div class="page-header-text">
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-subtitle">Overview of students, internships and applications.</p>
           </div>
         </div>
 
-        <!-- Recent Applications -->
-        <div class="card">
-          <h3 class="card-title">Recent Applications</h3>
-          <div class="table-wrapper">
+        <!-- Exactly Three Main Statistics -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-label">Total Students</div>
+            <div class="stat-card-value" id="dash-total-students">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Total Internships</div>
+            <div class="stat-card-value" id="dash-total-internships">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Total Applications</div>
+            <div class="stat-card-value" id="dash-total-applications">0</div>
+          </div>
+        </div>
+
+        <!-- Recent Applications Table -->
+        <div class="table-card">
+          <div class="table-card-header">
+            <h2 class="table-card-title">Recent Applications</h2>
+            <button class="btn btn-secondary btn-sm" onclick="switchToTab('applications')">View All</button>
+          </div>
+          <div class="table-container">
             <table>
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>STUDENT</th>
-                  <th>INTERNSHIP</th>
-                  <th>STATUS</th>
+                  <th style="width: 80px;">ID</th>
+                  <th>Student</th>
+                  <th>Internship</th>
+                  <th style="width: 140px;">Status</th>
                 </tr>
               </thead>
               <tbody id="dash-recent-tbody">
@@ -83,16 +114,19 @@
         </div>
 
         <!-- Recent Internships (Latest 3) -->
-        <div class="card">
-          <h3 class="card-title">Recent Internships</h3>
-          <div class="table-wrapper">
+        <div class="table-card">
+          <div class="table-card-header">
+            <h2 class="table-card-title">Recent Internships</h2>
+            <button class="btn btn-secondary btn-sm" onclick="switchToTab('internships')">View All</button>
+          </div>
+          <div class="table-container">
             <table>
               <thead>
                 <tr>
-                  <th>INTERNSHIP</th>
-                  <th>COMPANY</th>
-                  <th>LOCATION</th>
-                  <th>ACTION</th>
+                  <th>Internship</th>
+                  <th>Company</th>
+                  <th>Location</th>
+                  <th style="width: 100px; text-align: right;">Action</th>
                 </tr>
               </thead>
               <tbody id="dash-recent-internships-tbody">
@@ -107,67 +141,36 @@
       <!-- 2. STUDENTS -->
       <!-- ========================================== -->
       <section class="page-section" id="sec-students">
-        <h2 class="page-title">Students</h2>
-        <p class="page-subtitle">Manage student records (Student Service :8002)</p>
-
-        <div class="grid-2">
-          <!-- Add Student Form -->
-          <div class="card">
-            <h3 class="card-title">Add Student</h3>
-            <form id="student-form">
-              <div class="form-group">
-                <label for="student-name">Full Name</label>
-                <input type="text" id="student-name" placeholder="Student name" required>
-              </div>
-              <div class="form-group">
-                <label for="student-email">Email Address</label>
-                <input type="email" id="student-email" placeholder="student@example.com" required>
-              </div>
-              <div class="form-group">
-                <label for="student-dept">Department</label>
-                <select id="student-dept">
-                  <option value="CSE">CSE</option>
-                  <option value="ISE">ISE</option>
-                  <option value="ECE">ECE</option>
-                  <option value="AI&DS">AI&DS</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="student-year">Year of Study</label>
-                <select id="student-year">
-                  <option value="1">1st Year</option>
-                  <option value="2">2nd Year</option>
-                  <option value="3" selected>3rd Year</option>
-                  <option value="4">4th Year</option>
-                </select>
-              </div>
-              <button type="submit" class="btn btn-primary">Add Student</button>
-            </form>
+        <div class="page-header">
+          <div class="page-header-text">
+            <h1 class="page-title">Students</h1>
+            <p class="page-subtitle">Manage student records.</p>
           </div>
+          <div class="page-header-actions">
+            <input type="text" id="search-students" class="search-input" placeholder="Search by name, email, department...">
+            <button class="btn btn-secondary btn-sm" onclick="loadStudents()">Refresh</button>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-student')">+ Add Student</button>
+          </div>
+        </div>
 
-          <!-- Student Table -->
-          <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-              <h3 class="card-title" style="margin-bottom:0;">Student List</h3>
-              <button class="btn btn-secondary btn-sm" onclick="loadStudents()">Refresh</button>
-            </div>
-            <div class="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Dept</th>
-                    <th>Year</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody id="students-tbody">
-                  <tr><td colspan="6" class="empty-state">Loading students...</td></tr>
-                </tbody>
-              </table>
-            </div>
+        <!-- Student Table -->
+        <div class="table-card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 70px;">ID</th>
+                  <th>Student Name</th>
+                  <th>Email Address</th>
+                  <th>Department</th>
+                  <th style="width: 100px;">Year</th>
+                  <th style="width: 90px; text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="students-tbody">
+                <tr><td colspan="6" class="empty-state">Loading students...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -176,56 +179,36 @@
       <!-- 3. INTERNSHIPS -->
       <!-- ========================================== -->
       <section class="page-section" id="sec-internships">
-        <h2 class="page-title">Internships</h2>
-        <p class="page-subtitle">Manage internship postings (Internship Service :8003)</p>
-
-        <div class="grid-2">
-          <!-- Add Internship Form -->
-          <div class="card">
-            <h3 class="card-title">Add Internship</h3>
-            <form id="internship-form">
-              <div class="form-group">
-                <label for="internship-title">Position Title</label>
-                <input type="text" id="internship-title" placeholder="e.g. Backend Intern" required>
-              </div>
-              <div class="form-group">
-                <label for="internship-company">Company</label>
-                <input type="text" id="internship-company" placeholder="e.g. Google / Microsoft" required>
-              </div>
-              <div class="form-group">
-                <label for="internship-location">Location</label>
-                <input type="text" id="internship-location" placeholder="e.g. Remote / Bangalore" required>
-              </div>
-              <div class="form-group">
-                <label for="internship-desc">Description</label>
-                <textarea id="internship-desc" rows="3" placeholder="Job description and requirements"></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary">Add Internship</button>
-            </form>
+        <div class="page-header">
+          <div class="page-header-text">
+            <h1 class="page-title">Internships</h1>
+            <p class="page-subtitle">Browse and manage available internship opportunities.</p>
           </div>
+          <div class="page-header-actions">
+            <input type="text" id="search-internships" class="search-input" placeholder="Search title, company, location...">
+            <button class="btn btn-secondary btn-sm" onclick="loadInternships()">Refresh</button>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-internship')">+ Add Internship</button>
+          </div>
+        </div>
 
-          <!-- Internship List -->
-          <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-              <h3 class="card-title" style="margin-bottom:0;">Internship Listings</h3>
-              <input type="text" id="search-internships" placeholder="Search internships..." style="max-width:200px;">
-            </div>
-            <div class="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Company</th>
-                    <th>Location</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody id="internships-tbody">
-                  <tr><td colspan="5" class="empty-state">Loading internships...</td></tr>
-                </tbody>
-              </table>
-            </div>
+        <!-- Internship Table / List -->
+        <div class="table-card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 70px;">ID</th>
+                  <th>Position Title</th>
+                  <th>Company</th>
+                  <th>Location</th>
+                  <th>Description</th>
+                  <th style="width: 90px; text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="internships-tbody">
+                <tr><td colspan="6" class="empty-state">Loading internships...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -234,61 +217,43 @@
       <!-- 4. APPLICATIONS -->
       <!-- ========================================== -->
       <section class="page-section" id="sec-applications">
-        <h2 class="page-title">Applications</h2>
-        <p class="page-subtitle">Submit applications and track status (Application Service :8004)</p>
+        <div class="page-header">
+          <div class="page-header-text">
+            <h1 class="page-title">Applications</h1>
+            <p class="page-subtitle">Track internship applications and their current status.</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary btn-sm" onclick="loadApplications()">Refresh</button>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-application')">+ Submit Application</button>
+          </div>
+        </div>
 
-        <!-- Checkpoint 3 Info Callout -->
-        <div class="info-box">
+        <!-- Checkpoint 3 Inter-Service Validation Demonstration Callout -->
+        <div class="info-banner">
           <div>
-            <strong>Checkpoint 3 Inter-Service Demo:</strong>
-            Application service verifies that Student and Internship exist before creating application.
+            <strong>Checkpoint 3 Inter-Service Validation:</strong>
+            Application Service (:8004) verifies that both Student and Internship exist over the internal Docker network before creating an application.
           </div>
           <button class="btn btn-secondary btn-sm" onclick="testInvalidStudentDemo()">Test Invalid ID (99999)</button>
         </div>
 
-        <div class="grid-2">
-          <!-- Submit Application Form -->
-          <div class="card">
-            <h3 class="card-title">Submit Application</h3>
-            <form id="apply-form">
-              <div class="form-group">
-                <label for="apply-student-id">Select Student</label>
-                <select id="apply-student-id" required>
-                  <option value="">Loading students...</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="apply-internship-id">Select Internship</label>
-                <select id="apply-internship-id" required>
-                  <option value="">Loading internships...</option>
-                </select>
-              </div>
-              <button type="submit" class="btn btn-primary">Submit Application</button>
-            </form>
-          </div>
-
-          <!-- Application List Table -->
-          <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-              <h3 class="card-title" style="margin-bottom:0;">Application List</h3>
-              <button class="btn btn-secondary btn-sm" onclick="loadApplications()">Refresh</button>
-            </div>
-            <div class="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Student</th>
-                    <th>Internship</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody id="applications-tbody">
-                  <tr><td colspan="5" class="empty-state">Loading applications...</td></tr>
-                </tbody>
-              </table>
-            </div>
+        <!-- Application List Table -->
+        <div class="table-card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 70px;">ID</th>
+                  <th>Student</th>
+                  <th>Internship Opportunity</th>
+                  <th style="width: 130px;">Status</th>
+                  <th style="width: 210px; text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="applications-tbody">
+                <tr><td colspan="5" class="empty-state">Loading applications...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -297,51 +262,60 @@
       <!-- 5. BENCHMARKS -->
       <!-- ========================================== -->
       <section class="page-section" id="sec-benchmarks">
-        <h2 class="page-title">Performance Benchmarks</h2>
-        <p class="page-subtitle">Checkpoint 4 & 5: Locust load testing and Docker container resource utilization</p>
+        <div class="page-header">
+          <div class="page-header-text">
+            <h1 class="page-title">Benchmarks</h1>
+            <p class="page-subtitle">Performance results for different concurrent workloads.</p>
+          </div>
+        </div>
 
-        <div class="card">
-          <h3 class="card-title">Workload Observation Table (W1 - W5)</h3>
-          <div class="table-wrapper">
+        <!-- Workload Observation Table (W1 - W5) -->
+        <div class="table-card">
+          <div class="table-card-header">
+            <h2 class="table-card-title">Workload Observation Table (W1 – W5)</h2>
+            <span class="cell-muted">Measured with Locust &amp; Docker Stats</span>
+          </div>
+          <div class="table-container">
             <table>
               <thead>
                 <tr>
                   <th>Workload</th>
                   <th>Concurrent Users</th>
-                  <th>Avg Response Time</th>
-                  <th>Throughput (RPS)</th>
-                  <th>Failures</th>
-                  <th>CPU (%)</th>
-                  <th>Memory (MB)</th>
+                  <th>Response Time</th>
+                  <th>Throughput</th>
+                  <th>Failed Requests</th>
+                  <th>CPU Usage</th>
+                  <th>Memory Usage</th>
                 </tr>
               </thead>
               <tbody>
-                <tr><td><strong>W1</strong></td><td>1 User</td><td>8.0 - 10.5 ms</td><td>3.1 RPS</td><td>0</td><td>1.0 - 2.1%</td><td>53 - 55 MB</td></tr>
-                <tr><td><strong>W2</strong></td><td>2 Users</td><td>9.0 - 10.5 ms</td><td>5.8 - 6.9 RPS</td><td>0</td><td>2.5 - 3.0%</td><td>54 - 55 MB</td></tr>
-                <tr><td><strong>W3</strong></td><td>4 Users</td><td>9.1 - 10.3 ms</td><td>11.6 - 13.6 RPS</td><td>0</td><td>4.9 - 5.5%</td><td>54 - 55 MB</td></tr>
-                <tr><td><strong>W4</strong></td><td>8 Users</td><td>9.4 - 11.2 ms</td><td>25.6 - 26.4 RPS</td><td>0</td><td>3.9 - 11.1%</td><td>55 MB</td></tr>
-                <tr><td><strong>W5</strong></td><td>16 Users</td><td>10.4 - 11.7 ms</td><td>50.4 - 50.8 RPS</td><td>0</td><td>3.9 - 19.2%</td><td>54 - 56 MB</td></tr>
+                <tr><td><strong>W1</strong></td><td>1 user</td><td>8.0 – 10.5 ms</td><td>3.1 RPS</td><td>0</td><td>1.0 – 2.1%</td><td>53 – 55 MB</td></tr>
+                <tr><td><strong>W2</strong></td><td>2 users</td><td>9.0 – 10.5 ms</td><td>5.8 – 6.9 RPS</td><td>0</td><td>2.5 – 3.0%</td><td>54 – 55 MB</td></tr>
+                <tr><td><strong>W3</strong></td><td>4 users</td><td>9.1 – 10.3 ms</td><td>11.6 – 13.6 RPS</td><td>0</td><td>4.9 – 5.5%</td><td>54 – 55 MB</td></tr>
+                <tr><td><strong>W4</strong></td><td>8 users</td><td>9.4 – 11.2 ms</td><td>25.6 – 26.4 RPS</td><td>0</td><td>3.9 – 11.1%</td><td>55 MB</td></tr>
+                <tr><td><strong>W5</strong></td><td>16 users</td><td>10.4 – 11.7 ms</td><td>50.4 – 50.8 RPS</td><td>0</td><td>3.9 – 19.2%</td><td>54 – 56 MB</td></tr>
               </tbody>
             </table>
           </div>
         </div>
 
+        <!-- Four Simple Graphs -->
         <div class="plots-grid">
           <div class="plot-card">
-            <img src="plots/1_response_time.png" alt="Response Time Graph">
-            <div class="plot-title">1. Concurrent Users vs Average Response Time</div>
+            <div class="plot-header">1. Response Time vs Concurrent Users</div>
+            <img src="plots/1_response_time.png" alt="Response Time vs Concurrent Users">
           </div>
           <div class="plot-card">
-            <img src="plots/2_throughput.png" alt="Throughput Graph">
-            <div class="plot-title">2. Concurrent Users vs Throughput (RPS)</div>
+            <div class="plot-header">2. Throughput vs Concurrent Users</div>
+            <img src="plots/2_throughput.png" alt="Throughput vs Concurrent Users">
           </div>
           <div class="plot-card">
-            <img src="plots/3_cpu_utilization.png" alt="CPU Utilization Graph">
-            <div class="plot-title">3. Concurrent Users vs CPU Utilization (%)</div>
+            <div class="plot-header">3. CPU Usage vs Concurrent Users</div>
+            <img src="plots/3_cpu_utilization.png" alt="CPU Usage vs Concurrent Users">
           </div>
           <div class="plot-card">
-            <img src="plots/4_memory_utilization.png" alt="Memory Utilization Graph">
-            <div class="plot-title">4. Concurrent Users vs Memory (MB)</div>
+            <div class="plot-header">4. Memory Usage vs Concurrent Users</div>
+            <img src="plots/4_memory_utilization.png" alt="Memory Usage vs Concurrent Users">
           </div>
         </div>
       </section>
@@ -350,14 +324,22 @@
       <!-- 6. SERVICE HEALTH -->
       <!-- ========================================== -->
       <section class="page-section" id="sec-health">
-        <h2 class="page-title">Service Health</h2>
-        <p class="page-subtitle">Real-time status of the 4 independent FastAPI microservices</p>
+        <div class="page-header">
+          <div class="page-header-text">
+            <h1 class="page-title">Service Health</h1>
+            <p class="page-subtitle">Status of the services used by the internship management system.</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary btn-sm" onclick="checkServiceHealth()">Refresh All Statuses</button>
+          </div>
+        </div>
 
         <div class="health-grid">
           <div class="health-card">
             <div class="health-info">
               <h3>Authentication Service</h3>
-              <p>Port 8001 | auth.db</p>
+              <p>Port 8001 &bull; auth.db</p>
+              <span class="health-tag">Supporting Service</span>
             </div>
             <span class="badge badge-online" id="status-auth">Online</span>
           </div>
@@ -365,7 +347,8 @@
           <div class="health-card">
             <div class="health-info">
               <h3>Student Service</h3>
-              <p>Port 8002 | students.db</p>
+              <p>Port 8002 &bull; students.db</p>
+              <span class="health-tag">Core Microservice</span>
             </div>
             <span class="badge badge-online" id="status-student">Online</span>
           </div>
@@ -373,7 +356,8 @@
           <div class="health-card">
             <div class="health-info">
               <h3>Internship Service</h3>
-              <p>Port 8003 | internships.db</p>
+              <p>Port 8003 &bull; internships.db</p>
+              <span class="health-tag">Core Microservice</span>
             </div>
             <span class="badge badge-online" id="status-internship">Online</span>
           </div>
@@ -381,16 +365,127 @@
           <div class="health-card">
             <div class="health-info">
               <h3>Application Service</h3>
-              <p>Port 8004 | applications.db</p>
+              <p>Port 8004 &bull; applications.db</p>
+              <span class="health-tag">Core Microservice</span>
             </div>
             <span class="badge badge-online" id="status-application">Online</span>
           </div>
         </div>
-
-        <button class="btn btn-secondary" onclick="checkServiceHealth()">Refresh All Statuses</button>
       </section>
 
     </main>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODALS -->
+  <!-- ========================================== -->
+
+  <!-- Modal: Add Student -->
+  <div class="modal-overlay" id="modal-student">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Student</h3>
+        <button type="button" class="modal-close" onclick="closeModal('modal-student')">&times;</button>
+      </div>
+      <form id="student-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="student-name">Full Name</label>
+            <input type="text" id="student-name" placeholder="e.g. Rahul Sharma" required>
+          </div>
+          <div class="form-group">
+            <label for="student-email">Email Address</label>
+            <input type="email" id="student-email" placeholder="rahul@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="student-dept">Department</label>
+            <select id="student-dept">
+              <option value="CSE">Computer Science (CSE)</option>
+              <option value="ISE">Information Science (ISE)</option>
+              <option value="ECE">Electronics &amp; Comm (ECE)</option>
+              <option value="AI&DS">AI &amp; Data Science (AI&amp;DS)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="student-year">Year of Study</label>
+            <select id="student-year">
+              <option value="1">1st Year</option>
+              <option value="2">2nd Year</option>
+              <option value="3" selected>3rd Year</option>
+              <option value="4">4th Year</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-student')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Student</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Internship -->
+  <div class="modal-overlay" id="modal-internship">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Internship Opportunity</h3>
+        <button type="button" class="modal-close" onclick="closeModal('modal-internship')">&times;</button>
+      </div>
+      <form id="internship-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="internship-title">Position Title</label>
+            <input type="text" id="internship-title" placeholder="e.g. Software Engineer Intern" required>
+          </div>
+          <div class="form-group">
+            <label for="internship-company">Company Name</label>
+            <input type="text" id="internship-company" placeholder="e.g. Microsoft / Google" required>
+          </div>
+          <div class="form-group">
+            <label for="internship-location">Location</label>
+            <input type="text" id="internship-location" placeholder="e.g. Bangalore / Remote" required>
+          </div>
+          <div class="form-group">
+            <label for="internship-desc">Role Description</label>
+            <textarea id="internship-desc" rows="3" placeholder="Key responsibilities and technical requirements"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-internship')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Internship</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Submit Application -->
+  <div class="modal-overlay" id="modal-application">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Submit Application</h3>
+        <button type="button" class="modal-close" onclick="closeModal('modal-application')">&times;</button>
+      </div>
+      <form id="apply-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="apply-student-id">Select Student</label>
+            <select id="apply-student-id" required>
+              <option value="">Loading students...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="apply-internship-id">Select Internship</label>
+            <select id="apply-internship-id" required>
+              <option value="">Loading internships...</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-application')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Application</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <div id="toast-container"></div>

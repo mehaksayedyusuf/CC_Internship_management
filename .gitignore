@@ -23,7 +23,8 @@ docker-compose.override.yml
 .locust/
 locust_reports/
 
-# IDE
+# IDE & Temporary
 .vscode/
 .idea/
 *.swp
+~$*
