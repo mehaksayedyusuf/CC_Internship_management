@@ -1,4 +1,4 @@
-# 🎓 Cloud-Native Internship Management System (IMS)
+# Cloud-Native Internship Management System (IMS)
 ### *Production-Ready Microservices Architecture with FastAPI, Docker Compose, SQLite, and Web Dashboard*
 
 [![Architecture](https://img.shields.io/badge/Architecture-Microservices-blue.svg)](https://fastapi.tiangolo.com/)
@@ -11,7 +11,7 @@
 
 ---
 
-## 📌 Executive Summary
+## Summary
 
 The **Internship Management System (IMS)** is a distributed, cloud-native web application designed according to strict microservices architectural principles. Developed as part of the **Cloud Computing (CC)** curriculum, this repository showcases a production-grade implementation where every functional domain is encapsulated into an isolated microservice with its own dedicated SQLite persistence store, container runtime, and REST API interface.
 
@@ -25,7 +25,7 @@ Unlike monolithic designs or basic lab implementations, this system features:
 
 ---
 
-## 🏗️ System Architecture & Network Topology
+## System Architecture & Network Topology
 
 ### 1. Architectural Blueprint (Mermaid Diagram)
 
@@ -144,7 +144,7 @@ flowchart TB
 
 ---
 
-## 🔄 Checkpoint 3: Synchronous Inter-Service Communication Flow
+## Synchronous Inter-Service Communication Flow
 
 The core highlight of this architecture is **distributed inter-service verification**. When an applicant submits an internship application, `application-service` does **not** trust external input blindly. Instead, it queries the `student-service` and `internship-service` via internal HTTP calls across the Docker DNS bridge before writing to its own database.
 
@@ -203,7 +203,7 @@ sequenceDiagram
 
 ---
 
-## 🛠️ Microservices Deep Dive & API Reference
+## Microservices Deep Dive & API Reference
 
 All services expose automatic OpenAPI 3.0 interactive Swagger documentation available in your browser:
 * **Auth Service Docs:** [http://localhost:8001/docs](http://localhost:8001/docs)
@@ -292,7 +292,7 @@ Coordinates the end-to-end recruitment lifecycle and enforces cross-service vali
 
 ---
 
-## 💻 Quickstart & Deployment Guide
+## Quickstart & Deployment Guide
 
 ### Prerequisites
 * **Docker Desktop** (Engine 24.0+, Compose v2.0+)
@@ -337,7 +337,7 @@ Open your web browser and navigate to:
 
 ---
 
-## 🧪 Automated Verification Suite (`verify_stack.py`)
+## Automated Verification Suite (`verify_stack.py`)
 
 A dedicated Python test runner is included to prove end-to-end functionality to college evaluators in seconds:
 
@@ -481,7 +481,7 @@ CC_Internship_management/
 
 ---
 
-## 🛡️ Useful Docker Management Commands
+## Useful Docker Management Commands
 
 ```bash
 # 1. View live aggregated logs from all services
