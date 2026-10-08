@@ -87,7 +87,7 @@ Interactive OpenAPI documentation (Swagger UI) is available for every service:
 
 ---
 
-## 4. Inter-Service Communication (Checkpoint 3)
+## 4. Inter-Service Communication 
 
 The Application Service coordinates application submissions by executing synchronous verification over Docker internal networking before writing to `applications.db`.
 
@@ -260,7 +260,7 @@ python generate_plots.py
 
 ---
 
-## 7. Course Checkpoint Compliance Matrix
+## 7.  Checkpoint Compliance Matrix
 
 | Checkpoint | Requirement | Implementation Evidence |
 | :--- | :--- | :--- |
@@ -331,8 +331,3 @@ docker compose down -v
 
 ---
 
-## 10. Submission Details
-* **Student Name:** Mehak Sayed Yusuf
-* **Course:** Cloud Computing Laboratory (CC)
-* **Project Title:** Cloud-Native Microservices Internship Management System
-* **Repository:** [https://github.com/mehaksayedyusuf/CC_Internship_management](https://github.com/mehaksayedyusuf/CC_Internship_management)
