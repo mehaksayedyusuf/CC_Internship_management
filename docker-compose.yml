@@ -2,53 +2,89 @@ services:
   frontend:
     image: nginx:alpine
     container_name: frontend-dashboard
+    restart: unless-stopped
     ports:
       - "8000:80"
     volumes:
-      - ./frontend:/usr/share/nginx/html
+      - ./frontend:/usr/share/nginx/html:ro
     depends_on:
-      - auth
-      - student
-      - internship
-      - application
+      auth:
+        condition: service_started
+      student:
+        condition: service_started
+      internship:
+        condition: service_started
+      application:
+        condition: service_started
+    networks:
+      - ims-network
 
   auth:
     image: authentication-service:latest
     build: ./authentication-service
     container_name: auth-service
+    restart: unless-stopped
     ports:
       - "8001:8000"
     environment:
       DATABASE_URL: sqlite:////data/auth.db
+      JWT_SECRET: ims-super-secure-production-secret-key-2026
     volumes:
       - auth_data:/data
+    networks:
+      - ims-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   student:
     image: student-service:latest
     build: ./student-service
     container_name: student-service
+    restart: unless-stopped
     ports:
       - "8002:8000"
     environment:
       DATABASE_URL: sqlite:////data/students.db
     volumes:
       - student_data:/data
+    networks:
+      - ims-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   internship:
     image: internship-service:latest
     build: ./internship-service
     container_name: internship-service
+    restart: unless-stopped
     ports:
       - "8003:8000"
     environment:
       DATABASE_URL: sqlite:////data/internships.db
     volumes:
       - internship_data:/data
+    networks:
+      - ims-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   application:
     image: application-service:latest
     build: ./application-service
     container_name: application-service
+    restart: unless-stopped
     ports:
       - "8004:8000"
     environment:
@@ -60,9 +96,26 @@ services:
       - internship
     volumes:
       - application_data:/data
+    networks:
+      - ims-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+networks:
+  ims-network:
+    name: ims-bridge-network
+    driver: bridge
 
 volumes:
   auth_data:
+    name: ims_auth_data
   student_data:
+    name: ims_student_data
   internship_data:
+    name: ims_internship_data
   application_data:
+    name: ims_application_data

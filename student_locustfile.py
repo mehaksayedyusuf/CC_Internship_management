@@ -7,6 +7,10 @@ class StudentServiceUser(HttpUser):
     def test_list_students(self):
         self.client.get("/students")
 
+    @task(2)
+    def test_filter_department(self):
+        self.client.get("/students?department=CSE")
+
     @task(1)
     def test_health_check(self):
-        self.client.get("/")
+        self.client.get("/health")

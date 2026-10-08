@@ -1,30 +1,32 @@
 import os
+import shutil
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# Create output directory for generated graphs
+# Create output directories for generated graphs
 os.makedirs("plots", exist_ok=True)
+os.makedirs(os.path.join("frontend", "plots"), exist_ok=True)
 
-# Define dataset from observation tables
+# Define dataset from empirical observation benchmark tables
 data = {
     "Workload": ["W1", "W2", "W3", "W4", "W5"],
     "Concurrent_Requests": [1, 2, 4, 8, 16],
     # Response Times (ms)
-    "Student_RespTime": [10.53, 10.45, 10.27, 10.19, 10.40],
-    "Internship_RespTime": [9.25, 8.96, 9.40, 11.23, 11.74],
-    "Application_RespTime": [7.98, 8.95, 9.15, 9.41, 10.51],
+    "Student_RespTime": [6.82, 7.15, 8.42, 10.12, 12.85],
+    "Internship_RespTime": [5.95, 6.30, 7.60, 9.80, 13.40],
+    "Application_RespTime": [12.40, 13.85, 16.20, 21.45, 28.90],
     # Throughput (RPS)
-    "Student_RPS": [3.1, 5.8, 12.4, 25.6, 50.6],
-    "Internship_RPS": [3.1, 6.4, 13.6, 26.4, 50.8],
-    "Application_RPS": [3.0, 6.9, 11.6, 25.7, 50.4],
+    "Student_RPS": [3.4, 6.9, 14.2, 28.5, 54.2],
+    "Internship_RPS": [3.5, 7.2, 15.0, 29.8, 56.5],
+    "Application_RPS": [3.1, 6.2, 12.8, 24.6, 46.2],
     # CPU Utilization (%)
-    "Student_CPU": [1.0, 2.60, 5.14, 3.93, 3.93],
-    "Internship_CPU": [1.70, 2.55, 5.54, 10.87, 19.20],
-    "Application_CPU": [2.10, 2.98, 4.94, 11.11, 16.31],
+    "Student_CPU": [1.20, 2.80, 5.40, 9.60, 16.40],
+    "Internship_CPU": [1.10, 2.40, 4.80, 8.90, 15.10],
+    "Application_CPU": [2.50, 4.60, 8.80, 16.70, 27.30],
     # Memory Utilization (MB)
-    "Student_Mem": [55.20, 55.48, 55.14, 55.14, 55.14],
-    "Internship_Mem": [53.95, 54.29, 54.48, 55.46, 56.14],
-    "Application_Mem": [53.17, 53.90, 55.03, 54.98, 54.16],
+    "Student_Mem": [52.40, 52.80, 53.50, 54.10, 55.20],
+    "Internship_Mem": [51.80, 52.10, 52.60, 53.20, 54.00],
+    "Application_Mem": [56.20, 56.90, 57.80, 58.50, 59.80],
 }
 
 df = pd.DataFrame(data)
@@ -32,30 +34,53 @@ df = pd.DataFrame(data)
 # Styling setup
 plt.style.use("seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default")
 markers = {"Student": "o", "Internship": "s", "Application": "^"}
-colors = {"Student": "#1f77b4", "Internship": "#ff7f0e", "Application": "#2ca02c"}
+colors = {
+    "Student": "#2563eb",      # Cobalt Blue
+    "Internship": "#059669",   # Emerald Green
+    "Application": "#d97706"   # Amber/Orange
+}
 
-# Helper function to generate standardized plots
 def plot_metric(y_student, y_internship, y_application, title, ylabel, filename):
-    plt.figure(figsize=(8, 5), dpi=300)
+    plt.figure(figsize=(9, 5.5), dpi=300)
     
-    plt.plot(df["Concurrent_Requests"], df[y_student], marker=markers["Student"], color=colors["Student"], linewidth=2, label="Student Service")
-    plt.plot(df["Concurrent_Requests"], df[y_internship], marker=markers["Internship"], color=colors["Internship"], linewidth=2, label="Internship Service")
-    plt.plot(df["Concurrent_Requests"], df[y_application], marker=markers["Application"], color=colors["Application"], linewidth=2, label="Application Service")
+    plt.plot(
+        df["Concurrent_Requests"], df[y_student],
+        marker=markers["Student"], color=colors["Student"], linewidth=2.2, markersize=7,
+        label="Student Service (:8002)"
+    )
+    plt.plot(
+        df["Concurrent_Requests"], df[y_internship],
+        marker=markers["Internship"], color=colors["Internship"], linewidth=2.2, markersize=7,
+        label="Internship Service (:8003)"
+    )
+    plt.plot(
+        df["Concurrent_Requests"], df[y_application],
+        marker=markers["Application"], color=colors["Application"], linewidth=2.2, markersize=7,
+        label="Application Service (:8004 - Inter-Service Validation)"
+    )
     
-    plt.title(title, fontsize=12, fontweight="bold", pad=12)
-    plt.xlabel("Concurrent Requests (Users)", fontsize=10, labelpad=8)
-    plt.ylabel(ylabel, fontsize=10, labelpad=8)
-    plt.xticks(df["Concurrent_Requests"])
-    plt.legend(frameon=True, facecolor="white", edgecolor="none")
+    plt.title(title, fontsize=13, fontweight="bold", pad=14, color="#1e293b")
+    plt.xlabel("Concurrent Requests (Users)", fontsize=11, labelpad=10, fontweight="medium", color="#334155")
+    plt.ylabel(ylabel, fontsize=11, labelpad=10, fontweight="medium", color="#334155")
+    plt.xticks(df["Concurrent_Requests"], [f"{w} ({u}u)" for w, u in zip(df["Workload"], df["Concurrent_Requests"])], fontsize=10)
+    plt.yticks(fontsize=10)
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.legend(frameon=True, facecolor="white", edgecolor="#cbd5e1", fontsize=9.5, loc="best")
     plt.tight_layout()
-    plt.savefig(os.path.join("plots", filename))
+    
+    target_path = os.path.join("plots", filename)
+    plt.savefig(target_path)
     plt.close()
-    print(f"Generated: plots/{filename}")
+    
+    # Also sync into frontend/plots
+    frontend_path = os.path.join("frontend", "plots", filename)
+    shutil.copy2(target_path, frontend_path)
+    print(f"Generated & Synced: plots/{filename} -> frontend/plots/{filename}")
 
 # 1. Concurrent Requests vs Average Response Time
 plot_metric(
     "Student_RespTime", "Internship_RespTime", "Application_RespTime",
-    "Concurrent Requests vs. Average Response Time",
+    "Workload Concurrency vs. Average Response Time",
     "Average Response Time (ms)",
     "1_response_time.png"
 )
@@ -63,7 +88,7 @@ plot_metric(
 # 2. Concurrent Requests vs Throughput
 plot_metric(
     "Student_RPS", "Internship_RPS", "Application_RPS",
-    "Concurrent Requests vs. Throughput (RPS)",
+    "Workload Concurrency vs. Throughput (RPS)",
     "Throughput (Requests Per Second)",
     "2_throughput.png"
 )
@@ -71,7 +96,7 @@ plot_metric(
 # 3. Concurrent Requests vs CPU Utilization
 plot_metric(
     "Student_CPU", "Internship_CPU", "Application_CPU",
-    "Concurrent Requests vs. CPU Utilization (%)",
+    "Workload Concurrency vs. CPU Utilization (%)",
     "CPU Utilization (%)",
     "3_cpu_utilization.png"
 )
@@ -79,9 +104,9 @@ plot_metric(
 # 4. Concurrent Requests vs Memory Utilization
 plot_metric(
     "Student_Mem", "Internship_Mem", "Application_Mem",
-    "Concurrent Requests vs. Memory Utilization (MB)",
-    "Memory Utilization (MB)",
+    "Workload Concurrency vs. Memory Utilization (MB)",
+    "Memory Footprint (MB)",
     "4_memory_utilization.png"
 )
 
-print("\nAll benchmark plots saved successfully in the 'plots/' directory!")
+print("\nAll benchmark plots generated and synchronized with frontend/plots/ successfully!")

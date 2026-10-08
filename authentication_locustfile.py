@@ -12,12 +12,13 @@ class AuthenticationServiceUser(HttpUser):
         self.client.post("/register", json={
             "name": "Benchmark User",
             "email": self.email,
-            "password": self.password
+            "password": self.password,
+            "role": "student"
         })
 
     @task(3)
     def test_login(self):
-        """Benchmark POST /login"""
+        """Benchmark POST /login (Bcrypt hashing + JWT issuance)"""
         self.client.post("/login", json={
             "email": self.email,
             "password": self.password
@@ -25,5 +26,5 @@ class AuthenticationServiceUser(HttpUser):
 
     @task(1)
     def test_health_check(self):
-        """Benchmark GET /"""
-        self.client.get("/")
+        """Benchmark GET /health"""
+        self.client.get("/health")
